@@ -22,7 +22,7 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 - اقتراح اليوم حسب الوقت (الصباح / بعد الظهر / المساء) — time-based daily suggestions
 - بطاقة تفاصيل لكل صنف: الأحجام، الأسعار، الاقترانات، ملاحظات التذوّق — per-item detail sheet with sizes, pricing, pairings and tasting notes
 - الأسعار بالريال العُماني — prices in Omani Rial
-- بناء طلب: إضافة أصناف وأحجام وعروض، ثم شاشة طلب مرتّبة تُعرَض على الموظف — build an order (items, sizes, pairing deals) into a clean ticket screen shown to staff
+- صفحة طلب واحدة: تجمع الأصناف والأحجام والعروض مع الكميات والإجمالي — a single order page collecting items, sizes and pairing deals with quantities and a running total
 - لا يُرسل الطلب إلى أي جهة ولا يُخزَّن؛ يعيش في الصفحة فقط — the order is never transmitted or stored; it lives in the page only
 
 ## ⚠️ يجب تعديله قبل الإطلاق / Must be set before launch
