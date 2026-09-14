@@ -22,6 +22,14 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 - اقتراح اليوم حسب الوقت (الصباح / بعد الظهر / المساء) — time-based daily suggestions
 - بطاقة تفاصيل لكل صنف: الأحجام، الأسعار، الاقترانات، ملاحظات التذوّق — per-item detail sheet with sizes, pricing, pairings and tasting notes
 - الأسعار بالريال العُماني — prices in Omani Rial
+- بناء طلب: إضافة أصناف وأحجام وعروض، ثم إرساله عبر واتساب أو عرضه للباريستا — build an order (items, sizes, pairing deals) and send it on WhatsApp or show it to the barista
+
+## ⚠️ يجب تعديله قبل الإطلاق / Must be set before launch
+
+| المكان | القيمة الحالية | |
+| --- | --- | --- |
+| `WA_NUMBER` في `index.html` | `96890000000` | رقم واتساب المقهى الحقيقي — بدونه زر «أرسل الطلب» لا يصل أحداً. The café's real WhatsApp number; without it the send button goes nowhere. |
+| `href="tel:+96890000000"` | نفس الرقم | زر «اتصل بنا». The Call button. |
 
 ## التشغيل محلياً / Run locally
 
