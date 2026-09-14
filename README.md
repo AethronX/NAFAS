@@ -16,20 +16,14 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 
 ## المميزات / Features
 
-- تبديل اللغة بين العربية والإنجليزية (مع دعم RTL) — Arabic/English toggle with full RTL support
-- بحث فوري في الأصناف — instant search across items
-- تصفية حسب الفئة: المختارات، القهوة، باردة، شاي ومشروبات، حلويات ومخبوزات، فطور — category filters
-- اقتراح اليوم حسب الوقت (الصباح / بعد الظهر / المساء) — time-based daily suggestions
-- بطاقة تفاصيل لكل صنف: الأحجام، الأسعار، الاقترانات، ملاحظات التذوّق — per-item detail sheet with sizes, pricing, pairings and tasting notes
+- ٣٥ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٨)، المشروبات الساخنة (٦)، المشروبات الباردة (٤)، المأكولات (٧) — 35 items transcribed from the café's printed menu
+- تبديل اللغة بين العربية والإنجليزية مع دعم RTL كامل — Arabic/English toggle with full RTL support
+- بحث فوري في الأسماء والأقسام — instant search across names and sections
+- علامات «ساخن / بارد» كما في المنيو المطبوع — the printed menu's hot/cold marks
+- اختيار النكهة للآيس تي والموهيتو — flavour choice for Ice Tea and Mojito
+- صفحة طلب واحدة: الكميات والإجمالي — a single order page with quantities and a running total
+- لا يُرسل الطلب إلى أي جهة ولا يُخزَّن؛ يعيش في الصفحة فقط — the order is never transmitted or stored
 - الأسعار بالريال العُماني — prices in Omani Rial
-- صفحة طلب واحدة: تجمع الأصناف والأحجام والعروض مع الكميات والإجمالي — a single order page collecting items, sizes and pairing deals with quantities and a running total
-- لا يُرسل الطلب إلى أي جهة ولا يُخزَّن؛ يعيش في الصفحة فقط — the order is never transmitted or stored; it lives in the page only
-
-## ⚠️ يجب تعديله قبل الإطلاق / Must be set before launch
-
-| المكان | القيمة الحالية | |
-| --- | --- | --- |
-| `href="tel:+96890000000"` في `index.html` | `+96890000000` | رقم المقهى الحقيقي — زر «اتصل بنا» لا يعمل بدونه. The café's real number; the Call button does nothing without it. |
 
 ## التشغيل محلياً / Run locally
 
