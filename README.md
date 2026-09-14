@@ -11,6 +11,7 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 | `index.html` | الصفحة الكاملة — تطبيق React مُجمّع بالكامل داخل ملف واحد (الخطوط والصور مُضمّنة كـ base64 ويتم فكّها وقت التشغيل). A fully self-contained React app; fonts and images are embedded as base64 and unpacked at runtime. |
 | `assets/logo-white.png` | الشعار بالأبيض — يظهر في شاشة التحميل. White logo used by the loading splash. |
 | `assets/favicon.png` | أيقونة الموقع. Site favicon. |
+| `assets/og.png` | بطاقة المعاينة عند مشاركة الرابط (واتساب، تويتر، فيسبوك). Link preview card for social/messaging shares. |
 | `vercel.json` | إعدادات النشر على Vercel. Vercel deployment settings. |
 
 ## المميزات / Features
