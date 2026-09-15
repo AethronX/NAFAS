@@ -20,6 +20,7 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 
 - ٣٥ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٨)، المشروبات الساخنة (٦)، المشروبات الباردة (٤)، المأكولات (٧) — 35 items transcribed from the café's printed menu
 - تبديل اللغة بين العربية والإنجليزية مع دعم RTL كامل — Arabic/English toggle with full RTL support
+- اقتراح واحد في صفحة الطلب يكمّل ما ينقصه: مشروب لطلب أكل، وأكل لطلب مشروبات — one suggestion on the order page for whichever side of the menu the basket is missing
 - بحث فوري في الأسماء والأقسام — instant search across names and sections
 - تجميع مشروبات القهوة في أربع مجموعات (لاتيه · إسبريسو · تحضير مختص · تركية وعربية) لتقليل عبء الاختيار — the 18 coffees grouped into four, to cut choice overload
 - مرشّح «يُقدَّم ساخناً / بارداً» مبني على علامات المنيو المطبوع — a served-hot/cold filter built from the printed menu's own marks

@@ -916,10 +916,20 @@ a:hover{color:#5E0A1F}
         <div style="margin-top:5px;font-size:13px;color:#75676A">{{ orderNote }}</div>
       </div>
 
-      <sc-if value="{{ suggestFood }}">
-        <div style="flex:none;display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid #E9DDE1;background:#fff">
-          <span style="flex:1;min-width:0;font-size:14px;color:#24191B">{{ addFoodLabel }}</span>
-          <button sc-camel-on-click="{{ goFood }}" style="flex:none;min-height:40px;padding:0 14px;border:1px solid #8A0F2D;border-radius:10px;background:#fff;color:#8A0F2D;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#8A0F2D;color:#fff">{{ browseFoodLabel }}</button>
+      <sc-if value="{{ hasSuggestion }}">
+        <div style="flex:none;padding:12px 18px 13px;border-bottom:1px solid #E9DDE1;background:#fff">
+          <div style="font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8A0F2D;font-weight:600">{{ suggestTitle }}</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:7px">
+            <span style="flex:1;min-width:0;display:block">
+              <span style="display:block;font-size:16px;font-weight:600;line-height:1.4">{{ suggestName }}</span>
+              <span dir="{{ subDir }}" style="display:block;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:#75676A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ suggestSub }}</span>
+            </span>
+            <span style="flex:none;display:inline-flex;align-items:center;font-family:Archivo,sans-serif;font-weight:800;font-size:17px;color:#24191B;white-space:nowrap">{{ suggestPrice }}<span aria-hidden="true" class="omr"></span></span>
+            <button sc-camel-on-click="{{ suggestAdd }}" aria-label="{{ suggestAria }}" style="flex:none;min-height:40px;padding:0 15px;display:flex;align-items:center;gap:7px;border:1px solid #8A0F2D;border-radius:10px;background:#fff;color:#8A0F2D;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#8A0F2D;color:#fff">
+              <svg class="i" width="15" height="15" sc-camel-view-box="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+              <span>{{ suggestLabel }}</span>
+            </button>
+          </div>
         </div>
       </sc-if>
 
@@ -1020,47 +1030,47 @@ const FLAVORS = [
 // price, description or claim is added to it.
 const P = [
 
-  { id: 'pist', grp: 'flavoured', ar: 'لاتيه بالفستق', en: 'Pistachio latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'saffron', grp: 'flavoured', ar: 'زعفران لاتيه', en: 'Saffron latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'span', grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'caramel', grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'honey', grp: 'flavoured', ar: 'لاتيه بالعسل', en: 'Honey latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'mangoesp', grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
+  { id: 'pist', with: 'sandegg', grp: 'flavoured', ar: 'لاتيه بالفستق', en: 'Pistachio latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'saffron', with: 'sandegg', grp: 'flavoured', ar: 'زعفران لاتيه', en: 'Saffron latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'span', with: 'toaster', grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'caramel', with: 'sandsaus', grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'honey', with: 'sandegg', grp: 'flavoured', ar: 'لاتيه بالعسل', en: 'Honey latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'mangoesp', with: 'chips', grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'latte', grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'capp', grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
-  { id: 'esp', grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'amer', grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'cortado', grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'latte', with: 'sandegg', grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'capp', with: 'sandsaus', grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'esp', with: 'sandegg', grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'amer', with: 'beef', grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'cortado', with: 'sandsaus', grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'v60n', house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
-  { id: 'v60', grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
-  { id: 'cbclassic', grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
-  { id: 'cbnefas', house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60n', with: 'beefsp', house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60', with: 'toaster', grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
+  { id: 'cbclassic', with: 'chips', grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
+  { id: 'cbnefas', with: 'chicken', house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'arabic', grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
-  { id: 'turks', grp: 'trad', ar: 'قهوة تركية (صغيرة)', en: 'Turkish coffee (Small)', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'turkl', grp: 'trad', ar: 'قهوة تركية (كبيرة)', en: 'Turkish coffee (Large)', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'arabic', with: 'sandegg', grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
+  { id: 'turks', with: 'sandegg', grp: 'trad', ar: 'قهوة تركية (صغيرة)', en: 'Turkish coffee (Small)', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'turkl', with: 'sandsaus', grp: 'trad', ar: 'قهوة تركية (كبيرة)', en: 'Turkish coffee (Large)', price: 1.0, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'matchah', grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
-  { id: 'teanuts', grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
-  { id: 'turktea', grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
-  { id: 'redseed', grp: 'hot', ar: 'الحبة الحمراء', en: 'Red Seed Drink', price: 0.5, cat: 'hot' },
+  { id: 'matchah', with: 'sandegg', grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
+  { id: 'teanuts', with: 'sandsaus', grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
+  { id: 'turktea', with: 'sandegg', grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
+  { id: 'redseed', with: 'sandegg', grp: 'hot', ar: 'الحبة الحمراء', en: 'Red Seed Drink', price: 0.5, cat: 'hot' },
   { id: 'salep', grp: 'hot', ar: 'سحلب', en: 'Salep', price: 0.7, cat: 'hot' },
-  { id: 'hotchoc', grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
+  { id: 'hotchoc', with: 'chips', grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
 
-  { id: 'matchac', grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
-  { id: 'mojito', grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
-  { id: 'rosella', grp: 'cold', ar: 'كركديه', en: 'Rosella', price: 1.0, cat: 'cold' },
-  { id: 'icetea', grp: 'cold', ar: 'آيس تي', en: 'Ice Tea', price: 1.0, cat: 'cold', flavors: true },
+  { id: 'matchac', with: 'toaster', grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
+  { id: 'mojito', with: 'chicken', grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
+  { id: 'rosella', with: 'beef', grp: 'cold', ar: 'كركديه', en: 'Rosella', price: 1.0, cat: 'cold' },
+  { id: 'icetea', with: 'chips', grp: 'cold', ar: 'آيس تي', en: 'Ice Tea', price: 1.0, cat: 'cold', flavors: true },
 
-  { id: 'beefsp', grp: 'food', ar: 'برجر لحم طازج سبشل', en: 'Special Fresh Beef Burger', price: 1.0, cat: 'food' },
-  { id: 'beef', grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
-  { id: 'sandegg', grp: 'food', ar: 'شطيرة بيض وجبن وبطاطس', en: 'Egg, cheese and chips Sandwich', price: 0.7, cat: 'food' },
-  { id: 'chips', grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
-  { id: 'sandsaus', grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
-  { id: 'toaster', grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
-  { id: 'chicken', grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' }
+  { id: 'beefsp', with: 'cbnefas', grp: 'food', ar: 'برجر لحم طازج سبشل', en: 'Special Fresh Beef Burger', price: 1.0, cat: 'food' },
+  { id: 'beef', with: 'cbclassic', grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
+  { id: 'sandegg', with: 'capp', grp: 'food', ar: 'شطيرة بيض وجبن وبطاطس', en: 'Egg, cheese and chips Sandwich', price: 0.7, cat: 'food' },
+  { id: 'chips', with: 'rosella', grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
+  { id: 'sandsaus', with: 'cortado', grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
+  { id: 'toaster', with: 'matchac', grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
+  { id: 'chicken', with: 'cbnefas', grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' }
 ];
 
 const T = {
@@ -1074,7 +1084,7 @@ const T = {
     total: 'الإجمالي', clearOrder: 'تفريغ الطلب', clearConfirm: 'اضغط مرة أخرى للتأكيد', addMore: 'أضف المزيد',
     item1: 'صنف', item2: 'صنفان', itemN: 'أصناف',
     orderNote: 'راجع الكميات والإجمالي قبل أن تطلب.',
-    addFood: 'تكمل طلبك بشيء من المأكولات؟', browseFood: 'تصفّح المأكولات',
+    suggestTitle: 'جرّبه مع', suggestAdd: 'أضف',
     a11ySearch: 'ابحث في المنيو', a11yClearSearch: 'مسح البحث', a11yClose: 'إغلاق',
     a11yInc: 'زيادة الكمية', a11yDec: 'إنقاص الكمية',
     a11yFlavorDialog: 'اختيار النكهة', a11yOrderDialog: 'طلبي',
@@ -1096,7 +1106,7 @@ const T = {
     total: 'Total', clearOrder: 'Clear order', clearConfirm: 'Tap again to confirm', addMore: 'Add more',
     item1: 'item', item2: 'items', itemN: 'items',
     orderNote: 'Check the quantities and total before you order.',
-    addFood: 'Round it off with something to eat?', browseFood: 'Browse the food',
+    suggestTitle: 'Try it with', suggestAdd: 'Add',
     a11ySearch: 'Search the menu', a11yClearSearch: 'Clear search', a11yClose: 'Close',
     a11yInc: 'Increase quantity', a11yDec: 'Decrease quantity',
     a11yFlavorDialog: 'Choose a flavour', a11yOrderDialog: 'My order',
@@ -1355,6 +1365,20 @@ class Component extends DCLogic {
       };
     }).filter(Boolean);
 
+    // what the basket is missing, and what already in it points there
+    const inOrder = Object.keys(s.order).map(k => k.split(':')[1]);
+    const held = inOrder.map(id => P.find(x => x.id === id)).filter(Boolean);
+    const hasFood = held.some(x => x.cat === 'food');
+    const hasDrink = held.some(x => x.cat !== 'food');
+    let sug = null;
+    if (held.length && !(hasFood && hasDrink)) {
+      for (const it of held) {
+        const w = it.with && P.find(x => x.id === it.with);
+        if (!w || inOrder.indexOf(w.id) >= 0) continue;
+        if ((w.cat === 'food') !== hasFood) { sug = w; break; }
+      }
+    }
+
     const fp = P.find(p => p.id === s.flavorFor);
 
     const orderCount = this.orderCount();
@@ -1413,12 +1437,18 @@ class Component extends DCLogic {
       })) : [],
       closeFlavor: () => this.setState({ flavorFor: null }),
 
-      // Food is the cheapest thing here, so a drink-only basket is the
-      // one worth a nudge. It is navigation, not a claim.
-      suggestFood: orderCount > 0 && !Object.keys(s.order)
-        .some(k => (P.find(x => x.id === k.split(':')[1]) || {}).cat === 'food'),
-      addFoodLabel: t.addFood, browseFoodLabel: t.browseFood,
-      goFood: () => this.setState({ orderOpen: false, cat: 'food', temp: null, query: '' }),
+      // One suggestion, drawn from what is already in the basket and pointing
+      // at the side of the menu it is missing: a drinks-only order gets
+      // something to eat, a food-only order gets something to drink. It is a
+      // taste suggestion, not a claim about what other people ordered.
+      hasSuggestion: !!sug,
+      suggestTitle: t.suggestTitle,
+      suggestName: sug ? this.nameOf(sug, l) : '',
+      suggestSub: sug ? this.subOf(sug, l) : '',
+      suggestPrice: sug ? F(sug.price) : '',
+      suggestLabel: t.suggestAdd,
+      suggestAria: sug ? t.suggestAdd + ' ' + this.nameOf(sug, l) : '',
+      suggestAdd: () => { if (sug) this.bump('p:' + sug.id + '::', 1); },
 
       hasOrder: orderCount > 0,
       orderCountLabel: this.countLabel(orderCount, t),
