@@ -1221,15 +1221,23 @@ class Component extends DCLogic {
     // Locking the body loses the scroll offset, so remember and give it back.
     const route = this.routeOf(this.state);
     if (this._route !== route) {
-      const wasDialog = /^\/(order|choose)/.test(this._route || '');
+      const prev = this._route;
+      const wasDialog = /^\/(order|choose)/.test(prev || '');
       const isDialog = /^\/(order|choose)/.test(route);
       this._route = route;
       // Typing would otherwise rewrite the URL on every keystroke, which
       // Safari rate-limits, so the search route settles after you stop.
       clearTimeout(this._rt);
       const go = () => {
-        if (isDialog && !wasDialog) history.pushState(null, '', '#' + route);
-        else if (!isDialog && wasDialog) history.back();
+        if (isDialog && !wasDialog) { this._base = prev; history.pushState(null, '', '#' + route); }
+        else if (!isDialog && wasDialog) {
+          // Going back restores the view the dialog was opened from, which is
+          // right when it was simply dismissed. But a dialog can also send you
+          // somewhere new - "browse the food" - and going back would undo that
+          // move the moment it happened. Replace the entry in that case.
+          if (route === this._base) history.back();
+          else history.replaceState(null, '', '#' + route);
+        }
         else history.replaceState(null, '', '#' + route);
       };
       if (route.indexOf('/search/') === 0) this._rt = setTimeout(go, 500); else go();
