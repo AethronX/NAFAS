@@ -788,7 +788,15 @@ a:hover{color:#5E0A1F}
             <svg class="i" width="17" height="17" sc-camel-view-box="0 0 24 24" style="color:#8A0F2D;margin-top:3px"><path sc-camel-d="{{ r.icon }}"></path></svg>
             <div style="flex:1;min-width:0">
               <div style="font-size:12px;color:#75676A">{{ r.label }}</div>
-              <div style="font-size:15px;font-weight:600">{{ r.value }}</div>
+              <sc-if value="{{ r.plain }}">
+                <div style="font-size:15px;font-weight:600">{{ r.value }}</div>
+              </sc-if>
+              <sc-if value="{{ r.isLink }}">
+                <a href="{{ r.href }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;min-height:28px;font-size:15px;font-weight:600;color:#8A0F2D" style-hover="color:#5E0A1F;text-decoration:underline">
+                  <span dir="ltr">{{ r.value }}</span>
+                  <svg class="i" width="14" height="14" sc-camel-view-box="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"></path><path d="M20 4 11 13"></path><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"></path></svg>
+                </a>
+              </sc-if>
             </div>
           </div>
         </sc-for>
@@ -1068,7 +1076,7 @@ const T = {
       { icon: I.pin, label: 'العنوان', value: 'سوق بهلاء' },
       { icon: I.clock, label: 'ساعات العمل', value: 'يومياً ٩ص – ١١م' },
       { icon: I.wifi, label: 'واي فاي', value: 'NAFAS · كلمة المرور على الطاولة' },
-      { icon: I.insta, label: 'إنستغرام', value: '@nefas_o' }
+      { icon: I.insta, label: 'إنستغرام', value: '@nefas_o', href: 'https://instagram.com/nefas_o' }
     ]
   },
   en: {
@@ -1090,7 +1098,7 @@ const T = {
       { icon: I.pin, label: 'Address', value: 'Bahla Souq' },
       { icon: I.clock, label: 'Hours', value: 'Daily 9am – 11pm' },
       { icon: I.wifi, label: 'Wi-Fi', value: 'NAFAS · password at your table' },
-      { icon: I.insta, label: 'Instagram', value: '@nefas_o' }
+      { icon: I.insta, label: 'Instagram', value: '@nefas_o', href: 'https://instagram.com/nefas_o' }
     ]
   }
 };
@@ -1331,7 +1339,8 @@ class Component extends DCLogic {
       a11yInc: t.a11yInc, a11yDec: t.a11yDec,
       a11yFlavorDialog: t.a11yFlavorDialog, a11yOrderDialog: t.a11yOrderDialog,
 
-      infoKicker: t.infoKicker, info: t.info,
+      infoKicker: t.infoKicker,
+      info: t.info.map(r => ({ ...r, isLink: !!r.href, plain: !r.href })),
       callLabel: t.call, mapLabel: t.map
     };
   }
