@@ -648,7 +648,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 }
 </style>
 <style>
-x-dc{display:none!important}#boot{position:fixed;inset-inline:0;top:0;z-index:5}#dc-root~#boot{display:none!important}html{scroll-behavior:smooth}
+x-dc{display:none!important}#boot{position:fixed;inset-inline:0;top:0;z-index:5}#dc-root~#boot{display:none!important}
 :root{--b950:#2E0410;--b900:#3E0616;--b800:#5E0A1F;--b700:#740D26;--b600:#8A0F2D;--b400:#B85C73;--b300:#CE8A9B;--b200:#F0CDD7;--b100:#F8E7EC;--b50:#FDF7F9;--ink:#24191B;--muted:#75676A;--line:#E9DDE1;--surface:#FAF8F7;--e1:0 1px 2px rgba(94,10,31,.05);--e2:0 1px 2px rgba(94,10,31,.05),0 8px 22px -14px rgba(94,10,31,.18);--e3:0 2px 6px rgba(94,10,31,.07),0 18px 44px -22px rgba(94,10,31,.30);--brand-grad:#8A0F2D;}html{color-scheme:light}body{margin:0;background:#EFE7E9;color:#24191B;font-family:"IBM Plex Sans Arabic","Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.75}
 h1,h2,h3,h4{font-family:"IBM Plex Sans Arabic","Archivo",system-ui,sans-serif;margin:0;line-height:1.35;letter-spacing:0}
 button,button.scp0{color:inherit}
@@ -1118,6 +1118,7 @@ class Component extends DCLogic {
   };
   componentDidMount() {
     this.syncDoc();
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.addEventListener('keydown', this.onKey);
     this.measure();
     if (typeof ResizeObserver !== 'undefined' && this.headerRef.current) {
@@ -1131,6 +1132,29 @@ class Component extends DCLogic {
     // reading layout on every update forces a reflow; the header only
     // changes height when the language does
     if (this._m !== this.state.lang) { this._m = this.state.lang; this.measure(); }
+    // Changing what the list shows should put you at the top of it. Without
+    // this you keep the old scroll position and land mid-way down a section
+    // you have not seen, or past the end of a shorter one.
+    const view = this.state.cat + '\u0000' + this.state.query;
+    const moved = this._view !== undefined && this._view !== view;
+    this._view = view;
+
+    // A dialog covers the page, so the page behind it must not scroll.
+    // Locking the body loses the scroll offset, so remember and give it back.
+    const lock = !!(this.state.orderOpen || this.state.flavorFor);
+    if (lock && !this._lock) {
+      this._lock = true;
+      this._y = window.scrollY;
+      document.body.style.overflow = 'hidden';
+    }
+    if (moved) this._y = 0;
+    if (!lock && this._lock) {
+      this._lock = false;
+      document.body.style.overflow = '';
+      window.scrollTo(0, this._y);
+    } else if (!lock && moved) {
+      window.scrollTo(0, 0);
+    }
   }
   componentWillUnmount() {
     if (this.ro) this.ro.disconnect();
