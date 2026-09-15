@@ -1016,44 +1016,48 @@ const FLAVORS = [
 // Every line below is transcribed from the café's printed menu. No item,
 // price, description or claim is added to it.
 const P = [
-  { id: 'mangoesp', grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
-  { id: 'esp', grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'amer', grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'latte', grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'span', grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+
   { id: 'pist', grp: 'flavoured', ar: 'لاتيه بالفستق', en: 'Pistachio latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'saffron', grp: 'flavoured', ar: 'زعفران لاتيه', en: 'Saffron latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'span', grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
   { id: 'caramel', grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
   { id: 'honey', grp: 'flavoured', ar: 'لاتيه بالعسل', en: 'Honey latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'saffron', grp: 'flavoured', ar: 'زعفران لاتيه', en: 'Saffron latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'cortado', grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'mangoesp', grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
+
+  { id: 'latte', grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
   { id: 'capp', grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
-  { id: 'v60', grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
+  { id: 'esp', grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'amer', grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'cortado', grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
+
   { id: 'v60n', grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
-  { id: 'turks', grp: 'trad', ar: 'قهوة تركية (صغيرة)', en: 'Turkish coffee (Small)', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'turkl', grp: 'trad', ar: 'قهوة تركية (كبيرة)', en: 'Turkish coffee (Large)', price: 1.0, cat: 'coffee', temp: ['hot'] },
-  { id: 'arabic', grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
+  { id: 'v60', grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
   { id: 'cbclassic', grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
   { id: 'cbnefas', grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'turktea', grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
-  { id: 'teanuts', grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
-  { id: 'salep', grp: 'hot', ar: 'سحلب', en: 'Salep', price: 0.7, cat: 'hot' },
-  { id: 'redseed', grp: 'hot', ar: 'الحبة الحمراء', en: 'Red Seed Drink', price: 0.5, cat: 'hot' },
-  { id: 'hotchoc', grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
+  { id: 'arabic', grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
+  { id: 'turks', grp: 'trad', ar: 'قهوة تركية (صغيرة)', en: 'Turkish coffee (Small)', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'turkl', grp: 'trad', ar: 'قهوة تركية (كبيرة)', en: 'Turkish coffee (Large)', price: 1.0, cat: 'coffee', temp: ['hot'] },
+
   { id: 'matchah', grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
+  { id: 'teanuts', grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
+  { id: 'turktea', grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
+  { id: 'redseed', grp: 'hot', ar: 'الحبة الحمراء', en: 'Red Seed Drink', price: 0.5, cat: 'hot' },
+  { id: 'salep', grp: 'hot', ar: 'سحلب', en: 'Salep', price: 0.7, cat: 'hot' },
+  { id: 'hotchoc', grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
 
   { id: 'matchac', grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
+  { id: 'mojito', grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
   { id: 'rosella', grp: 'cold', ar: 'كركديه', en: 'Rosella', price: 1.0, cat: 'cold' },
   { id: 'icetea', grp: 'cold', ar: 'آيس تي', en: 'Ice Tea', price: 1.0, cat: 'cold', flavors: true },
-  { id: 'mojito', grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
 
-  { id: 'beef', grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
   { id: 'beefsp', grp: 'food', ar: 'برجر لحم طازج سبشل', en: 'Special Fresh Beef Burger', price: 1.0, cat: 'food' },
-  { id: 'chicken', grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' },
-  { id: 'toaster', grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
+  { id: 'beef', grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
   { id: 'sandegg', grp: 'food', ar: 'شطيرة بيض وجبن وبطاطس', en: 'Egg, cheese and chips Sandwich', price: 0.7, cat: 'food' },
+  { id: 'chips', grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
   { id: 'sandsaus', grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
-  { id: 'chips', grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' }
+  { id: 'toaster', grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
+  { id: 'chicken', grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' }
 ];
 
 const T = {
