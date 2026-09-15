@@ -27,7 +27,8 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 - علامات «ساخن / بارد» كما في المنيو المطبوع — the printed menu's hot/cold marks
 - اختيار النكهة للآيس تي والموهيتو — flavour choice for Ice Tea and Mojito
 - صفحة طلب واحدة: الكميات والإجمالي — a single order page with quantities and a running total
-- لا يُرسل الطلب إلى أي جهة ولا يُخزَّن؛ يعيش في الصفحة فقط — the order is never transmitted or stored
+- لا يُرسل الطلب إلى أي جهة؛ يُحفظ على جهاز الزبون وحده لأربع ساعات ليصمد أمام تحديث الصفحة — the order is never transmitted; it is kept on the customer's own device for four hours so a reload cannot lose it
+- زر الرجوع يغلق النافذة ولا يغادر الصفحة — the back button closes a dialog instead of leaving the page
 - الأسعار بالريال العُماني — prices in Omani Rial
 
 ## التشغيل محلياً / Run locally
