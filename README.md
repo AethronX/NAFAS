@@ -8,11 +8,13 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 
 | File | Description |
 | --- | --- |
-| `index.html` | الصفحة الكاملة — تطبيق React مُجمّع بالكامل داخل ملف واحد (الخطوط والصور مُضمّنة كـ base64 ويتم فكّها وقت التشغيل). A fully self-contained React app; fonts and images are embedded as base64 and unpacked at runtime. |
-| `assets/logo-white.png` | الشعار بالأبيض — يظهر في شاشة التحميل. White logo used by the loading splash. |
-| `assets/favicon.png` | أيقونة الموقع. Site favicon. |
-| `assets/og.png` | بطاقة المعاينة عند مشاركة الرابط (واتساب، تويتر، فيسبوك). Link preview card for social/messaging shares. |
-| `vercel.json` | إعدادات النشر على Vercel. Vercel deployment settings. |
+| `index.html` | الصفحة: العلامة والأنماط وقالب التطبيق ومنطقه — the page: markup, styles, app template and logic |
+| `assets/react.js`, `assets/react-dom.js` | React 18 (UMD, production) |
+| `assets/dc-runtime.js` | محرّك القالب (مصغَّر) — the template runtime (minified) |
+| `assets/f/*.woff2` | ١٩ مقطعاً من IBM Plex Sans Arabic و Archivo؛ المتصفح يجلب ما يلزم فقط — 19 subsets; the browser fetches only what it needs |
+| `assets/logo-white.webp` | الشعار — the wordmark |
+| `assets/favicon.png`, `assets/og.png` | الأيقونة وبطاقة المشاركة — icon and share card |
+| `vercel.json` | التخزين المؤقت وترويسات الأمان — caching and security headers |
 
 ## المميزات / Features
 
