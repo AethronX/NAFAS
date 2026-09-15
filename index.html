@@ -1124,14 +1124,43 @@ class Component extends DCLogic {
     if (this.state.orderOpen) this.setState({ orderOpen: false });
     else if (this.state.flavorFor) this.setState({ flavorFor: null });
   };
-  // A dialog opens a history entry so Android's back button - the one gesture
-  // people actually use to dismiss things - closes it instead of leaving the
-  // page and taking the order with it.
-  onPop = () => {
-    if (this.state.orderOpen || this.state.flavorFor) {
-      this._popped = true;
-      this.setState({ orderOpen: false, flavorFor: null });
+  // Every view has an address. That makes each one shareable and deep-linkable
+  // (a table card can point straight at the food), gives Android's back button
+  // something to go back to instead of leaving the page, and means any
+  // analytics that counts page views can see the funnel without custom events.
+  //
+  // Browsing replaces the entry so back does not walk through every category
+  // you tapped; a dialog pushes one so back closes it.
+  routeOf(st) {
+    if (st.orderOpen) return '/order';
+    if (st.flavorFor) return '/choose/' + st.flavorFor;
+    if (st.query.trim()) return '/search/' + encodeURIComponent(st.query.trim());
+    return '/' + st.cat;
+  }
+  applyRoute = () => {
+    const h = (location.hash || '').replace(/^#/, '') || '/all';
+    const base = { cat: 'all', query: '', orderOpen: false, flavorFor: null };
+    let next;
+    if (h === '/order') next = { ...base, cat: this.state.cat, orderOpen: true };
+    else if (h.indexOf('/choose/') === 0) {
+      const id = h.slice(8);
+      next = P.some(x => x.id === id && x.flavors)
+        ? { ...base, cat: this.state.cat, flavorFor: id } : { ...base };
     }
+    else if (h.indexOf('/search/') === 0) {
+      let q = ''; try { q = decodeURIComponent(h.slice(8)); } catch (e) {}
+      next = { ...base, query: q };
+    }
+    else {
+      const cat = h.replace(/^\//, '');
+      next = { ...base, cat: CATS.some(c => c.key === cat) ? cat : 'all' };
+    }
+    // a hash we do not recognise renders the full menu, so the address bar
+    // should say so rather than keep claiming a view that does not exist
+    const canon = this.routeOf({ ...this.state, ...next });
+    if (location.hash && location.hash !== '#' + canon) history.replaceState(null, '', '#' + canon);
+    this._route = canon;
+    this.setState(next);
   };
 
   // The basket survives a reload or a mis-tap, on this device only. It is
@@ -1157,9 +1186,10 @@ class Component extends DCLogic {
   componentDidMount() {
     this.syncDoc();
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    window.addEventListener('popstate', this.onPop);
+    window.addEventListener('popstate', this.applyRoute);
     const kept = this.loadOrder();
     if (kept) this.setState({ order: kept });
+    if (location.hash) this.applyRoute(); else this._route = this.routeOf(this.state);
     window.addEventListener('keydown', this.onKey);
     this.measure();
     if (typeof ResizeObserver !== 'undefined' && this.headerRef.current) {
@@ -1182,14 +1212,24 @@ class Component extends DCLogic {
 
     // A dialog covers the page, so the page behind it must not scroll.
     // Locking the body loses the scroll offset, so remember and give it back.
-    const lock = !!(this.state.orderOpen || this.state.flavorFor);
-    if (lock && !this._hist) { this._hist = true; history.pushState({ dc: 1 }, ''); }
-    else if (!lock && this._hist) {
-      this._hist = false;
-      // a pop already consumed the entry; a button press has to consume it
-      if (this._popped) this._popped = false; else history.back();
+    const route = this.routeOf(this.state);
+    if (this._route !== route) {
+      const wasDialog = /^\/(order|choose)/.test(this._route || '');
+      const isDialog = /^\/(order|choose)/.test(route);
+      this._route = route;
+      // Typing would otherwise rewrite the URL on every keystroke, which
+      // Safari rate-limits, so the search route settles after you stop.
+      clearTimeout(this._rt);
+      const go = () => {
+        if (isDialog && !wasDialog) history.pushState(null, '', '#' + route);
+        else if (!isDialog && wasDialog) history.back();
+        else history.replaceState(null, '', '#' + route);
+      };
+      if (route.indexOf('/search/') === 0) this._rt = setTimeout(go, 500); else go();
     }
     if (this._saved !== this.state.order) { this._saved = this.state.order; this.saveOrder(this.state.order); }
+
+    const lock = !!(this.state.orderOpen || this.state.flavorFor);
     if (lock && !this._lock) {
       this._lock = true;
       this._y = window.scrollY;
@@ -1206,7 +1246,7 @@ class Component extends DCLogic {
   }
   componentWillUnmount() {
     if (this.ro) this.ro.disconnect();
-    window.removeEventListener('popstate', this.onPop);
+    window.removeEventListener('popstate', this.applyRoute);
     window.removeEventListener('keydown', this.onKey);
     window.removeEventListener('resize', this.measure);
   }

@@ -31,6 +31,36 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 - زر الرجوع يغلق النافذة ولا يغادر الصفحة — the back button closes a dialog instead of leaving the page
 - الأسعار بالريال العُماني — prices in Omani Rial
 
+## القياس / Measurement
+
+كل شاشة لها عنوان خاص، فأي أداة تحليلات تَعُدّ الصفحات ترى القمع كاملاً بلا أحداث مخصّصة:
+Every view has its own address, so any page-view analytics sees the whole funnel without custom events:
+
+| العنوان | الشاشة |
+| --- | --- |
+| `/` · `#/all` | كل المنيو — full menu |
+| `#/coffee` `#/hot` `#/cold` `#/food` | قسم — a section |
+| `#/search/<كلمة>` | بحث — a search, including the ones that return nothing |
+| `#/order` | صفحة الطلب — the order page |
+| `#/choose/<id>` | اختيار النكهة — the flavour chooser |
+
+`#/search/...` هو أثمن ما يُقاس: ما يبحث عنه الزبائن ولا تبيعونه.
+`#/search/...` is the most valuable signal here: what customers look for and you do not sell.
+
+**لتفعيل التحليلات:** من لوحة Vercel فعّل Web Analytics وSpeed Insights (مجاناً)، ثم أضف قبل `</body>`:
+**To switch analytics on:** enable Web Analytics and Speed Insights in the Vercel dashboard (free), then add before `</body>`:
+
+```html
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+```
+
+كلاهما من نفس النطاق، فلا يحتاجان استثناءً في الـ CSP ولا يضعان كوكيز.
+Both are first-party, so they need no CSP exception and set no cookies.
+
+> ⚠️ لا تُضفهما قبل التفعيل: الملفان يعطيان 404 فينزل تقييم Best Practices من 100 إلى 96 بلا أي بيانات مقابل ذلك — قِستُه.
+> Do not add them before enabling: the files 404 and Best Practices drops from 100 to 96 for no data in return — measured.
+
 ## التشغيل محلياً / Run locally
 
 ```bash
