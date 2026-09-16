@@ -1015,6 +1015,31 @@ const ORDER = ['flavoured', 'espresso', 'brew', 'trad', 'hot', 'cold', 'food'];
 const tempsOf = p => p.temp || (p.cat === 'hot' ? ['hot'] : p.cat === 'cold' ? ['cold'] : []);
 const F = n => n.toFixed(3);
 
+// Pairings run on two tracks that never cross. A refresher asks for something
+// to eat; coffee asks for something sweet. Each item below names its partner
+// per track, so a suggestion is always a deliberate pairing, never a guess.
+//   refresh  cold drinks      -> savoury
+//   coffee   the coffee list  -> sweet, and savoury while no sweet exists
+//   warm     hot non-coffee   -> sweet, then savoury
+//   savoury  the food list    -> refresh, then coffee
+//   sweet    desserts         -> coffee, then warm      (no item carries it yet)
+const SIDE = p => p.cat === 'food' ? (p.sweet ? 'sweet' : 'savoury')
+  : p.cat === 'coffee' ? 'coffee'
+  : p.cat === 'hot' ? 'warm' : 'refresh';
+const WANTS = {
+  coffee: ['sweet', 'savoury'],
+  warm: ['sweet', 'savoury'],
+  refresh: ['savoury'],
+  savoury: ['refresh', 'coffee'],
+  sweet: ['coffee', 'warm']
+};
+// An egg sandwich reaches for the coffee first; everything else on the food
+// list reaches for the cold drink first.
+const wantsOf = p => p.wants || WANTS[SIDE(p)];
+// A suggestion has to land in the basket in one tap, so anything that would
+// first ask for a flavour or a temperature can never be suggested.
+const oneTap = p => !p.flavors && tempsOf(p).length < 2;
+
 // Served-temperature marks, transcribed from the printed menu's hot/cold icons.
 const TEMP = { hot: { ar: 'ساخن', en: 'Hot' }, cold: { ar: 'بارد', en: 'Cold' } };
 // The one choice the printed menu offers: the flavour of an iced tea or mojito.
@@ -1030,47 +1055,47 @@ const FLAVORS = [
 // price, description or claim is added to it.
 const P = [
 
-  { id: 'pist', with: 'sandegg', grp: 'flavoured', ar: 'لاتيه بالفستق', en: 'Pistachio latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'saffron', with: 'sandegg', grp: 'flavoured', ar: 'زعفران لاتيه', en: 'Saffron latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'span', with: 'toaster', grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'caramel', with: 'sandsaus', grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'honey', with: 'sandegg', grp: 'flavoured', ar: 'لاتيه بالعسل', en: 'Honey latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'mangoesp', with: 'chips', grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
+  { id: 'pist', with: { savoury: 'sandegg' }, grp: 'flavoured', ar: 'لاتيه بالفستق', en: 'Pistachio latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'saffron', with: { savoury: 'sandegg' }, grp: 'flavoured', ar: 'زعفران لاتيه', en: 'Saffron latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'span', with: { savoury: 'toaster' }, grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'caramel', with: { savoury: 'sandsaus' }, grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'honey', with: { savoury: 'sandegg' }, grp: 'flavoured', ar: 'لاتيه بالعسل', en: 'Honey latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'mangoesp', with: { savoury: 'chips' }, grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'latte', with: 'sandegg', grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'capp', with: 'sandsaus', grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
-  { id: 'esp', with: 'sandegg', grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'amer', with: 'beef', grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'cortado', with: 'sandsaus', grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'latte', with: { savoury: 'sandegg' }, grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'capp', with: { savoury: 'sandsaus' }, grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'esp', with: { savoury: 'sandegg' }, grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'amer', with: { savoury: 'beef' }, grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'cortado', with: { savoury: 'sandsaus' }, grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'v60n', with: 'beefsp', house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
-  { id: 'v60', with: 'toaster', grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
-  { id: 'cbclassic', with: 'chips', grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
-  { id: 'cbnefas', with: 'chicken', house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60n', with: { savoury: 'beefsp' }, house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60', with: { savoury: 'toaster' }, grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
+  { id: 'cbclassic', with: { savoury: 'chips' }, grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
+  { id: 'cbnefas', with: { savoury: 'chicken' }, house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'arabic', with: 'sandegg', grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
-  { id: 'turks', with: 'sandegg', grp: 'trad', ar: 'قهوة تركية (صغيرة)', en: 'Turkish coffee (Small)', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'turkl', with: 'sandsaus', grp: 'trad', ar: 'قهوة تركية (كبيرة)', en: 'Turkish coffee (Large)', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'arabic', with: { savoury: 'sandegg' }, grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
+  { id: 'turks', with: { savoury: 'sandegg' }, grp: 'trad', ar: 'قهوة تركية (صغيرة)', en: 'Turkish coffee (Small)', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'turkl', with: { savoury: 'sandsaus' }, grp: 'trad', ar: 'قهوة تركية (كبيرة)', en: 'Turkish coffee (Large)', price: 1.0, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'matchah', with: 'sandegg', grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
-  { id: 'teanuts', with: 'sandsaus', grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
-  { id: 'turktea', with: 'sandegg', grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
-  { id: 'redseed', with: 'sandegg', grp: 'hot', ar: 'الحبة الحمراء', en: 'Red Seed Drink', price: 0.5, cat: 'hot' },
+  { id: 'matchah', with: { savoury: 'sandegg' }, grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
+  { id: 'teanuts', with: { savoury: 'sandsaus' }, grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
+  { id: 'turktea', with: { savoury: 'sandegg' }, grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
+  { id: 'redseed', with: { savoury: 'sandsaus' }, grp: 'hot', ar: 'الحبة الحمراء', en: 'Red Seed Drink', price: 0.5, cat: 'hot' },
   { id: 'salep', grp: 'hot', ar: 'سحلب', en: 'Salep', price: 0.7, cat: 'hot' },
-  { id: 'hotchoc', with: 'chips', grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
+  { id: 'hotchoc', with: { savoury: 'chips' }, grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
 
-  { id: 'matchac', with: 'toaster', grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
-  { id: 'mojito', with: 'chicken', grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
-  { id: 'rosella', with: 'beef', grp: 'cold', ar: 'كركديه', en: 'Rosella', price: 1.0, cat: 'cold' },
-  { id: 'icetea', with: 'chips', grp: 'cold', ar: 'آيس تي', en: 'Ice Tea', price: 1.0, cat: 'cold', flavors: true },
+  { id: 'matchac', with: { savoury: 'toaster' }, grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
+  { id: 'mojito', with: { savoury: 'chicken' }, grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
+  { id: 'rosella', with: { savoury: 'beef' }, grp: 'cold', ar: 'كركديه', en: 'Rosella', price: 1.0, cat: 'cold' },
+  { id: 'icetea', with: { savoury: 'beefsp' }, grp: 'cold', ar: 'آيس تي', en: 'Ice Tea', price: 1.0, cat: 'cold', flavors: true },
 
-  { id: 'beefsp', with: 'cbnefas', grp: 'food', ar: 'برجر لحم طازج سبشل', en: 'Special Fresh Beef Burger', price: 1.0, cat: 'food' },
-  { id: 'beef', with: 'cbclassic', grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
-  { id: 'sandegg', with: 'capp', grp: 'food', ar: 'شطيرة بيض وجبن وبطاطس', en: 'Egg, cheese and chips Sandwich', price: 0.7, cat: 'food' },
-  { id: 'chips', with: 'rosella', grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
-  { id: 'sandsaus', with: 'cortado', grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
-  { id: 'toaster', with: 'matchac', grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
-  { id: 'chicken', with: 'cbnefas', grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' }
+  { id: 'beefsp', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر لحم طازج سبشل', en: 'Special Fresh Beef Burger', price: 1.0, cat: 'food' },
+  { id: 'beef', with: { refresh: 'rosella', coffee: 'cbclassic' }, grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
+  { id: 'sandegg', wants: ['coffee', 'refresh'], with: { refresh: 'matchac', coffee: 'capp' }, grp: 'food', ar: 'شطيرة بيض وجبن وبطاطس', en: 'Egg, cheese and chips Sandwich', price: 0.7, cat: 'food' },
+  { id: 'chips', with: { refresh: 'rosella', coffee: 'cbclassic' }, grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
+  { id: 'sandsaus', wants: ['coffee', 'refresh'], with: { refresh: 'matchac', coffee: 'cortado' }, grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
+  { id: 'toaster', with: { refresh: 'matchac', coffee: 'v60' }, grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
+  { id: 'chicken', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' }
 ];
 
 const T = {
@@ -1365,7 +1390,10 @@ class Component extends DCLogic {
       };
     }).filter(Boolean);
 
-    // what the basket is missing, and what already in it points there
+    // What the basket is missing, and what is already in it that points there.
+    // Each item is asked for its own track first, so a cold drink comes back
+    // with something to eat and a coffee with something sweet. A basket that
+    // already holds both something to eat and something to drink is left alone.
     const inOrder = Object.keys(s.order).map(k => k.split(':')[1]);
     const held = inOrder.map(id => P.find(x => x.id === id)).filter(Boolean);
     const hasFood = held.some(x => x.cat === 'food');
@@ -1373,9 +1401,12 @@ class Component extends DCLogic {
     let sug = null;
     if (held.length && !(hasFood && hasDrink)) {
       for (const it of held) {
-        const w = it.with && P.find(x => x.id === it.with);
-        if (!w || inOrder.indexOf(w.id) >= 0) continue;
-        if ((w.cat === 'food') !== hasFood) { sug = w; break; }
+        sug = wantsOf(it)
+          .map(side => (it.with || {})[side])
+          .map(id => id && P.find(x => x.id === id))
+          .find(c => c && oneTap(c) && inOrder.indexOf(c.id) < 0
+                  && (c.cat === 'food') !== hasFood) || null;
+        if (sug) break;
       }
     }
 
@@ -1437,9 +1468,9 @@ class Component extends DCLogic {
       })) : [],
       closeFlavor: () => this.setState({ flavorFor: null }),
 
-      // One suggestion, drawn from what is already in the basket and pointing
-      // at the side of the menu it is missing: a drinks-only order gets
-      // something to eat, a food-only order gets something to drink. It is a
+      // One suggestion, drawn from what is already in the basket and following
+      // that item's own track: a refresher brings back something to eat, a
+      // coffee brings back something sweet where the menu has one. It is a
       // taste suggestion, not a claim about what other people ordered.
       hasSuggestion: !!sug,
       suggestTitle: t.suggestTitle,

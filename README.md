@@ -20,10 +20,9 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 
 - ٣٥ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٨)، المشروبات الساخنة (٦)، المشروبات الباردة (٤)، المأكولات (٧) — 35 items transcribed from the café's printed menu
 - تبديل اللغة بين العربية والإنجليزية مع دعم RTL كامل — Arabic/English toggle with full RTL support
-- اقتراح واحد في صفحة الطلب يكمّل ما ينقصه: مشروب لطلب أكل، وأكل لطلب مشروبات — one suggestion on the order page for whichever side of the menu the basket is missing
+- اقتراح واحد في صفحة الطلب على مسارين منفصلين: المشروبات الباردة ↔ المأكولات، والقهوة ↔ الحلا — one suggestion on the order page, on two separate tracks: cold drinks ↔ food, and coffee ↔ dessert
 - بحث فوري في الأسماء والأقسام — instant search across names and sections
 - تجميع مشروبات القهوة في أربع مجموعات (لاتيه · إسبريسو · تحضير مختص · تركية وعربية) لتقليل عبء الاختيار — the 18 coffees grouped into four, to cut choice overload
-- مرشّح «يُقدَّم ساخناً / بارداً» مبني على علامات المنيو المطبوع — a served-hot/cold filter built from the printed menu's own marks
 - عدّاد كمية داخل الصف: التعديل بضغطة واحدة بلا مغادرة المكان — an in-row stepper: one tap to adjust, without leaving your place
 - علامات «ساخن / بارد» كما في المنيو المطبوع — the printed menu's hot/cold marks
 - اختيار النكهة للآيس تي والموهيتو — flavour choice for Ice Tea and Mojito
@@ -69,9 +68,30 @@ python3 -m http.server 8000
 # افتح / open http://localhost:8000
 ```
 
-> ملاحظة: يجب تقديم الصفحة عبر خادم HTTP وليس فتحها مباشرة من الملف، لأن فكّ الموارد يعتمد على `blob:` URLs.
-> Note: serve over HTTP rather than opening the file directly — resource unpacking relies on `blob:` URLs.
+> ملاحظة: قدّم الصفحة عبر خادم HTTP ولا تفتحها من الملف مباشرة، لأن الخطوط والسكربتات تُجلب بمسارات نسبية.
+> Note: serve over HTTP rather than opening the file directly — the fonts and scripts are fetched over relative paths.
 
 ## النشر / Deployment
 
 موقع ثابت بالكامل — لا يحتاج خطوة بناء. Fully static; no build step required. Vercel serves the repository root as-is.
+
+## الاقتراحات / Pairings
+
+الاقتراح في صفحة الطلب يمشي على مسارين لا يتقاطعان، وكل صنف يسمّي شريكه بنفسه في `index.html`:
+
+The order page's suggestion runs on two tracks that never cross. Every item names its own partner, in `index.html`:
+
+```js
+{ id: 'rosella',  with: { savoury: 'beef' } }                      // بارد → أكل
+{ id: 'beef',     with: { refresh: 'rosella', coffee: 'cbclassic' } } // أكل → بارد ثم قهوة
+{ id: 'esp',      with: { savoury: 'sandegg' } }                   // قهوة → أكل
+```
+
+- `refresh` المشروبات الباردة، `warm` المشروبات الساخنة، `coffee` مشروبات القهوة، `savoury` المأكولات المالحة، `sweet` الحلا.
+- المسار `coffee ↔ sweet` جاهز في الكود لكنه فارغ: **لا يوجد صنف حلا في المنيو**. أضف صنف حلا بـ `sweet: true`، وأضف `sweet: '<id>'` إلى القهوة التي تناسبه، فيعمل المسار من تلقاء نفسه ويسبق المالح.
+- الاقتراح يجب أن يُضاف بضغطة واحدة، لذلك يستبعد الكود تلقائياً كل صنف يسأل عن نكهة أو عن ساخن/بارد أولاً.
+- `wants` تقلب ترتيب المسارين لصنف واحد: شطيرتا البيض تطلبان القهوة قبل البارد.
+
+- The `coffee ↔ sweet` track is wired but empty: **the menu has no dessert item**. Add one with `sweet: true` and a `sweet: '<id>'` on the coffees it suits, and the track activates on its own, ahead of the savoury fallback.
+- A suggestion must land in one tap, so the code excludes anything that would first ask for a flavour or a temperature.
+- `wants` flips the track order for a single item: the two egg sandwiches ask for coffee before a cold drink.
