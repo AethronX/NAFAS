@@ -878,12 +878,13 @@ a:hover{color:#5E0A1F}
           <h2 style="display:block;font-size:19px;font-weight:700;line-height:1.3">{{ myOrderLabel }}</h2>
           <span style="display:block;font-size:12px;color:rgba(255,255,255,.74)">{{ orderCountLabel }}</span>
         </span>
+        <button sc-camel-on-click="{{ toggleLang }}" style="flex:none;min-height:40px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.34);cursor:pointer;font-family:Archivo,sans-serif;font-size:11px;font-weight:600;color:#fff;letter-spacing:0.08em;transition:background 160ms,border-color 160ms" style-hover="background:#fff;border-color:#fff;color:#8A0F2D">{{ langLabel }}</button>
         <button sc-camel-on-click="{{ closeOrder }}" aria-label="{{ a11yClose }}" style="flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.30);cursor:pointer;color:#fff" style-hover="background:#fff;color:#8A0F2D">
           <svg class="i" width="17" height="17" sc-camel-view-box="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
         </button>
       </div>
 
-      <div class="scroll" style="flex:0 1 auto;overflow-y:auto;min-height:0">
+      <div class="scroll" style="flex:1 1 auto;overflow-y:auto;min-height:0">
         <sc-for list="{{ orderLines }}" as="o" hint-placeholder-count="3">
           <div style="padding:15px 18px;border-bottom:1px solid #F0CDD7">
             <div style="display:flex;align-items:baseline;gap:12px">
@@ -906,9 +907,8 @@ a:hover{color:#5E0A1F}
             </div>
           </div>
         </sc-for>
-      </div>
 
-      <div style="flex:none;border-top:2px solid #8A0F2D;background:#FDF7F9;padding:16px 18px">
+      <div style="border-top:2px solid #8A0F2D;background:#FDF7F9;padding:16px 18px">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:17px;font-weight:700">{{ totalLabel }}</span>
           <span style="margin-inline-start:auto;display:inline-flex;align-items:center;font-family:Archivo,sans-serif;font-weight:800;font-size:31px;letter-spacing:-.02em;color:#8A0F2D;white-space:nowrap">{{ orderTotalLabel }}<span aria-hidden="true" class="omr"></span></span>
@@ -917,7 +917,7 @@ a:hover{color:#5E0A1F}
       </div>
 
       <sc-if value="{{ hasSuggestion }}">
-        <div style="flex:none;border-bottom:1px solid #E9DDE1">
+        <div style="border-bottom:1px solid #E9DDE1">
           <div style="background:#FDF7F9;border-top:1px solid #E9DDE1;border-bottom:1px solid #E9DDE1;padding:13px 18px 11px;display:flex;align-items:baseline;gap:9px" style-before="content:'';display:block;flex:none;align-self:center;width:3px;height:17px;border-radius:999px;background:#8A0F2D">
             <span style="flex:none;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8A0F2D;font-weight:600">{{ suggestTitle }}</span>
             <h2 style="font-size:16px;font-weight:700;white-space:nowrap">{{ suggestSection }}</h2>
@@ -978,10 +978,9 @@ a:hover{color:#5E0A1F}
           </sc-for>
         </div>
       </sc-if>
+      </div>
 
-      <div style="flex:1;min-height:14px"></div>
-
-      <div style="flex:none;padding:0 18px calc(16px + env(safe-area-inset-bottom))">
+      <div style="flex:none;border-top:1px solid #E9DDE1;background:#fff;padding:14px 18px calc(16px + env(safe-area-inset-bottom))">
         <button sc-camel-on-click="{{ closeOrder }}" style="width:100%;min-height:52px;border:1px solid #E9DDE1;border-radius:12px;background:#fff;color:#24191B;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" style-hover="border-color:#8A0F2D;color:#8A0F2D;background:#FDF7F9">
           <svg class="i" width="17" height="17" sc-camel-view-box="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
           <span>{{ addMoreLabel }}</span>
@@ -1087,6 +1086,27 @@ const WANTS = {
 const wantsOf = p => p.wants || WANTS[SIDE(p)];
 // Each side is a section of the menu, offered whole.
 const CAT_OF = { sweet: 'sweets', savoury: 'food', coffee: 'coffee', warm: 'hot', refresh: 'cold' };
+
+// An order line is 'p:<id>:<temp>:<flavour>'. Only the menu writes one, but it
+// comes back from a device's own storage, where anything could be sitting, so
+// it is read against the menu again: the item has to still be on it, a
+// temperature only where the menu serves that item both ways, and a flavour
+// only where the menu lists flavours. Anything else is not a line.
+const readKey = key => {
+  const parts = String(key).split(':');
+  if (parts.length !== 4 || parts[0] !== 'p') return null;
+  const p = P.find(x => x.id === parts[1]);
+  if (!p) return null;
+  const temps = tempsOf(p), temp = parts[2], flav = parts[3];
+  if (temps.length > 1 ? temps.indexOf(temp) < 0 : temp !== '') return null;
+  if (p.flavors ? !(FLAVORS[+flav] && String(+flav) === flav) : flav !== '') return null;
+  return { p, temp, flav };
+};
+// Two items can print the same name - the hot matcha and the cold one - so a
+// line for either has to say which one it is.
+const twins = p => P.some(x => x !== p && (x.ar === p.ar || x.en === p.en));
+// A mis-tap should not be able to put four thousand coffees on the counter.
+const MAX_QTY = 99;
 
 // Served-temperature marks, transcribed from the printed menu's hot/cold icons.
 const TEMP = { hot: { ar: 'ساخن', en: 'Hot' }, cold: { ar: 'بارد', en: 'Cold' } };
@@ -1221,7 +1241,9 @@ class Component extends DCLogic {
   // Browsing replaces the entry so back does not walk through every category
   // you tapped; a dialog pushes one so back closes it.
   routeOf(st) {
-    if (st.orderOpen) return st.flavorFor ? '/order/choose/' + st.flavorFor : '/order';
+    // a link to the order page is only a place to be while there is an order
+    if (st.orderOpen && Object.keys(st.order).length)
+      return st.flavorFor ? '/order/choose/' + st.flavorFor : '/order';
     if (st.flavorFor) return '/choose/' + st.flavorFor;
     if (st.query.trim()) return '/search/' + encodeURIComponent(st.query.trim());
     return '/' + st.cat;
@@ -1269,10 +1291,13 @@ class Component extends DCLogic {
     try {
       const raw = JSON.parse(localStorage.getItem('nafas.order') || 'null');
       if (!raw || Date.now() - raw.t > this.KEEP) return null;
-      // drop anything whose item no longer exists on the menu
+      // keep only what the menu could have written, at a quantity it could
+      // have counted to
       const clean = {};
-      for (const k of Object.keys(raw.order || {})) {
-        if (P.some(x => x.id === k.split(':')[1])) clean[k] = raw.order[k];
+      for (const k of Object.keys(Object(raw.order))) {
+        if (!readKey(k)) continue;
+        const n = Math.floor(Number(raw.order[k]));
+        if (Number.isFinite(n) && n > 0) clean[k] = Math.min(n, MAX_QTY);
       }
       return Object.keys(clean).length ? clean : null;
     } catch (e) { return null; }
@@ -1281,6 +1306,10 @@ class Component extends DCLogic {
     this.syncDoc();
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.addEventListener('popstate', this.applyRoute);
+    // popstate is the back button only. Pasting a link with a different
+    // section into a tab that already has the menu open is a hashchange, and
+    // without this the route sync would quietly put the old section back.
+    window.addEventListener('hashchange', this.applyRoute);
     const kept = this.loadOrder();
     if (kept) this.setState({ order: kept });
     if (location.hash) this.applyRoute(); else this._route = this.routeOf(this.state);
@@ -1354,6 +1383,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     if (this.ro) this.ro.disconnect();
     window.removeEventListener('popstate', this.applyRoute);
+    window.removeEventListener('hashchange', this.applyRoute);
     window.removeEventListener('keydown', this.onKey);
     window.removeEventListener('resize', this.measure);
   }
@@ -1366,16 +1396,20 @@ class Component extends DCLogic {
   // 'p:<id>:<temp>:<flavour>' — temp is recorded only for a drink the menu
   // offers both ways, flavour only where the menu lists flavours.
   lineOf(key, l) {
-    const parts = key.split(':');
-    const p = P.find(x => x.id === parts[1]);
+    const k = readKey(key);
+    if (!k) return null;
+    const { p, temp, flav } = k;
     const bits = [];
-    if (parts[2]) bits.push(TEMP[parts[2]][l]);
-    if (parts[3] !== '' && parts[3] !== undefined) bits.push(FLAVORS[+parts[3]][l]);
+    // say the temperature where the menu offered a choice, and where the name
+    // alone would not tell this item from another with the same name
+    if (temp) bits.push(TEMP[temp][l]);
+    else if (twins(p) && tempsOf(p).length === 1) bits.push(TEMP[tempsOf(p)[0]][l]);
+    if (flav !== '') bits.push(FLAVORS[+flav][l]);
     return { name: this.nameOf(p, l), sub: bits.join(' · '), hasSub: bits.length > 0, price: p.price };
   }
   bump(key, by) {
     const order = { ...this.state.order };
-    const next = (order[key] || 0) + by;
+    const next = Math.min((order[key] || 0) + by, MAX_QTY);
     if (next <= 0) delete order[key]; else order[key] = next;
     const empty = !Object.keys(order).length;
     this.setState({ order, orderOpen: empty ? false : this.state.orderOpen });
@@ -1384,7 +1418,7 @@ class Component extends DCLogic {
   orderTotal() {
     const l = this.state.lang;
     return Object.entries(this.state.order)
-      .reduce((a, [k, n]) => a + this.lineOf(k, l).price * n, 0);
+      .reduce((a, [k, n]) => { const line = this.lineOf(k, l); return line ? a + line.price * n : a; }, 0);
   }
   countLabel(n, t) { return n + ' ' + (n === 1 ? t.item1 : n === 2 ? t.item2 : t.itemN); }
 
@@ -1466,12 +1500,13 @@ class Component extends DCLogic {
     const orderTotal = this.orderTotal();
     const orderLines = Object.keys(s.order).map(k => {
       const line = this.lineOf(k, l);
+      if (!line) return null;
       return {
         name: line.name, sub: line.sub, hasSub: line.hasSub, qty: s.order[k],
         lineTotal: F(line.price * s.order[k]),
         inc: () => this.bump(k, 1), dec: () => this.bump(k, -1)
       };
-    });
+    }).filter(Boolean);
 
     return {
       dir: l === 'ar' ? 'rtl' : 'ltr',
@@ -1529,7 +1564,7 @@ class Component extends DCLogic {
       orderTotalLabel: F(orderTotal),
       viewOrderLabel: t.viewOrder,
       openOrder: () => this.setState({ orderOpen: true, flavorFor: null }),
-      orderOpen: s.orderOpen,
+      orderOpen: s.orderOpen && orderCount > 0,
       closeOrder: () => this.setState({ orderOpen: false }),
       myOrderLabel: t.myOrder, totalLabel: t.total, orderNote: t.orderNote,
       // One stray tap used to wipe the whole basket with no way back, so the

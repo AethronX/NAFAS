@@ -28,6 +28,7 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 - اختيار النكهة للآيس تي والموهيتو — flavour choice for Ice Tea and Mojito
 - صفحة طلب واحدة: الكميات والإجمالي — a single order page with quantities and a running total
 - لا يُرسل الطلب إلى أي جهة؛ يُحفظ على جهاز الزبون وحده لأربع ساعات ليصمد أمام تحديث الصفحة — the order is never transmitted; it is kept on the customer's own device for four hours so a reload cannot lose it
+- تبديل اللغة متاح داخل صفحة الطلب أيضاً، لا في المنيو وحده — the language switch is on the order page too, not only on the menu
 - زر الرجوع يغلق النافذة ولا يغادر الصفحة — the back button closes a dialog instead of leaving the page
 - الأسعار بالريال العُماني — prices in Omani Rial
 
@@ -103,3 +104,17 @@ The order page's suggestion runs on two tracks that never cross. Every item name
 - `WANTS` sets what each side asks for, in order. Coffee and hot drinks ask for `sweet` then `savoury`, so removing the sweets restores the fallback on its own.
 - `wants` flips the order for a single item: the two egg sandwiches ask for coffee before a cold drink.
 - Shelf rows are the menu's own rows — stepper, hot/cold buttons, and the flavour sheet, which opens above the order page at `#/order/choose/<id>` and whose back button returns to the order, not the menu.
+
+## صفحة الطلب / The order page
+
+- **كل شيء قابل للوصول.** الترويسة ثابتة فوق، وزرّا «أضف المزيد» و«تفريغ الطلب» ثابتان تحت، وما بينهما يمرّر — الطلب والإجمالي والرفّ. جُرِّب على ارتفاع ٥٦٨ و٦٦٧ و٨٤٤ بكسل، وبالمنيو كاملاً في السلة (٤٥ سطراً، ١٠٢ زر).
+- **صنفان بالاسم نفسه يقولان أيهما.** «ماتشا لاتيه» موجودة ساخنة وباردة، فالسطر يحمل «ساخن» أو «بارد» ولا يترك الزبون يظن أنه كرّر الصنف.
+- **حدّ الكمية ٩٩.** ضغطة خاطئة متكرّرة لا تضع أربعة آلاف قهوة على الكاونتر.
+- **ما يُقرأ من الجهاز يُفحص مقابل المنيو.** سطر الطلب مفتاحه `p:<id>:<temp>:<flavour>`، ويُقرأ عبر `readKey()`: الصنف لا بدّ أن يكون ما زال في المنيو، ودرجة الحرارة لا تُقبل إلا لما يُقدَّم بالوجهين، والنكهة لا تُقبل إلا لما يعرض نكهات، والكمية عدد صحيح موجب. أي شيء آخر يُسقط بدل أن يُعرض أو يُعطّل الصفحة.
+- **رابط `#/order` بسلة فارغة** يفتح المنيو، لا صفحة طلب صفرية.
+
+- **Everything is reachable.** The header is pinned above and the two buttons below; the order, the total and the shelf scroll between them. Verified at 568, 667 and 844px tall, and with the whole menu in the basket — 45 lines and 102 controls.
+- **Two items with the same name say which they are.** Matcha Latte exists hot and cold, so each line carries Hot or Cold.
+- **Quantity is capped at 99.**
+- **Anything read back from a device is checked against the menu** by `readKey()` — the item must still be on it, a temperature only where the menu serves both ways, a flavour only where it lists them, and a whole positive quantity. Anything else is dropped rather than shown or allowed to break the page.
+- **`#/order` on an empty basket** opens the menu, not a zero order page.
