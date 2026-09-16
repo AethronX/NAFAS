@@ -18,11 +18,11 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 
 ## المميزات / Features
 
-- ٣٥ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٨)، المشروبات الساخنة (٦)، المشروبات الباردة (٤)، المأكولات (٧) — 35 items transcribed from the café's printed menu
+- ٣٣ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٣)، المشروبات الساخنة (٥)، المشروبات الباردة (٤)، المأكولات (٧)، الحلا (٤) — 33 items transcribed from the café's printed menu
 - تبديل اللغة بين العربية والإنجليزية مع دعم RTL كامل — Arabic/English toggle with full RTL support
-- اقتراح واحد في صفحة الطلب على مسارين منفصلين: المشروبات الباردة ↔ المأكولات، والقهوة ↔ الحلا — one suggestion on the order page, on two separate tracks: cold drinks ↔ food, and coffee ↔ dessert
+- اقتراح واحد في صفحة الطلب على مسارين منفصلين: المشروبات الباردة ↔ المأكولات، والقهوة ↔ الحلا — one suggestion on the order page, on two separate tracks: cold drinks ↔ food, and coffee ↔ sweets
 - بحث فوري في الأسماء والأقسام — instant search across names and sections
-- تجميع مشروبات القهوة في أربع مجموعات (لاتيه · إسبريسو · تحضير مختص · تركية وعربية) لتقليل عبء الاختيار — the 18 coffees grouped into four, to cut choice overload
+- تجميع مشروبات القهوة في أربع مجموعات (بنكهات · إسبريسو · تحضير مختص · عربية) لتقليل عبء الاختيار — the 13 coffees grouped into four, to cut choice overload
 - عدّاد كمية داخل الصف: التعديل بضغطة واحدة بلا مغادرة المكان — an in-row stepper: one tap to adjust, without leaving your place
 - علامات «ساخن / بارد» كما في المنيو المطبوع — the printed menu's hot/cold marks
 - اختيار النكهة للآيس تي والموهيتو — flavour choice for Ice Tea and Mojito
@@ -82,16 +82,19 @@ python3 -m http.server 8000
 The order page's suggestion runs on two tracks that never cross. Every item names its own partner, in `index.html`:
 
 ```js
-{ id: 'rosella',  with: { savoury: 'beef' } }                      // بارد → أكل
-{ id: 'beef',     with: { refresh: 'rosella', coffee: 'cbclassic' } } // أكل → بارد ثم قهوة
-{ id: 'esp',      with: { savoury: 'sandegg' } }                   // قهوة → أكل
+{ id: 'rosella', with: { savoury: 'beef' } }                          // بارد → أكل
+{ id: 'beef',    with: { refresh: 'rosella', coffee: 'cbclassic' } }  // أكل → بارد ثم قهوة
+{ id: 'esp',     with: { sweet: 'tiramisu' } }                        // قهوة → حلا
+{ id: 'baklava', with: { coffee: 'arabic' } }                         // حلا → قهوة
 ```
 
-- `refresh` المشروبات الباردة، `warm` المشروبات الساخنة، `coffee` مشروبات القهوة، `savoury` المأكولات المالحة، `sweet` الحلا.
-- المسار `coffee ↔ sweet` جاهز في الكود لكنه فارغ: **لا يوجد صنف حلا في المنيو**. أضف صنف حلا بـ `sweet: true`، وأضف `sweet: '<id>'` إلى القهوة التي تناسبه، فيعمل المسار من تلقاء نفسه ويسبق المالح.
-- الاقتراح يجب أن يُضاف بضغطة واحدة، لذلك يستبعد الكود تلقائياً كل صنف يسأل عن نكهة أو عن ساخن/بارد أولاً.
-- `wants` تقلب ترتيب المسارين لصنف واحد: شطيرتا البيض تطلبان القهوة قبل البارد.
+- الأطراف: `refresh` المشروبات الباردة، `warm` المشروبات الساخنة، `coffee` مشروبات القهوة، `savoury` المأكولات، `sweet` الحلا. كل صنف يأخذ طرفه من `cat`.
+- `WANTS` يحدّد ترتيب ما يطلبه كل طرف. القهوة والساخن يطلبان `sweet` ثم `savoury`، فلو حُذف الحلا يوماً يكفي إضافة `savoury: '<id>'` ليعود المسار البديل.
+- `wants` تقلب الترتيب لصنف واحد: شطيرتا البيض تطلبان القهوة قبل البارد.
+- الاقتراح يجب أن يُضاف بضغطة واحدة، و`oneTap()` يستبعد تلقائياً كل صنف يسأل عن نكهة أو عن ساخن/بارد أولاً — لا تُختار الأهداف يدوياً.
+- سحلب بلا شريك عمداً.
 
-- The `coffee ↔ sweet` track is wired but empty: **the menu has no dessert item**. Add one with `sweet: true` and a `sweet: '<id>'` on the coffees it suits, and the track activates on its own, ahead of the savoury fallback.
-- A suggestion must land in one tap, so the code excludes anything that would first ask for a flavour or a temperature.
-- `wants` flips the track order for a single item: the two egg sandwiches ask for coffee before a cold drink.
+- Sides come from `cat`; `WANTS` sets what each side asks for, in order.
+- Coffee and hot drinks ask for `sweet` then `savoury`, so removing the sweets only needs a `savoury: '<id>'` to restore the fallback.
+- A suggestion must land in one tap, and `oneTap()` enforces that in code — it excludes anything that would first ask for a flavour or a temperature, so targets are never hand-vetted.
+- `wants` flips the order for a single item: the two egg sandwiches ask for coffee before a cold drink. Salep is deliberately unpaired.

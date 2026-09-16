@@ -998,18 +998,20 @@ const CATS = [
   { key: 'coffee', ar: 'مشروبات القهوة', en: 'Coffee Drinks', icon: I.coffee },
   { key: 'hot', ar: 'المشروبات الساخنة', en: 'Hot Drinks', icon: I.cup },
   { key: 'cold', ar: 'المشروبات الباردة', en: 'Cold Drinks', icon: I.glass },
-  { key: 'food', ar: 'المأكولات', en: 'Food', icon: I.burger }
+  { key: 'food', ar: 'المأكولات', en: 'Food', icon: I.burger },
+  { key: 'sweets', ar: 'الحلا', en: 'Sweets', icon: I.cake }
 ];
 const GROUPS = {
   flavoured: { ar: 'قهوة بنكهات', en: 'Flavoured coffee' },
   espresso: { ar: 'إسبريسو وكلاسيكياته', en: 'Espresso classics' },
   brew: { ar: 'تحضير مختص وكولد برو', en: 'Specialty & cold brew' },
-  trad: { ar: 'قهوة تركية وعربية', en: 'Turkish & Arabic' },
+  trad: { ar: 'قهوة عربية', en: 'Arabic coffee' },
   hot: { ar: 'المشروبات الساخنة', en: 'Hot Drinks' },
   cold: { ar: 'المشروبات الباردة', en: 'Cold Drinks' },
-  food: { ar: 'المأكولات', en: 'Food' }
+  food: { ar: 'المأكولات', en: 'Food' },
+  sweets: { ar: 'الحلا', en: 'Sweets' }
 };
-const ORDER = ['flavoured', 'espresso', 'brew', 'trad', 'hot', 'cold', 'food'];
+const ORDER = ['flavoured', 'espresso', 'brew', 'trad', 'hot', 'cold', 'food', 'sweets'];
 // Served-temperature filter. Coffees carry their own marks; a hot drink is
 // hot and a cold drink is cold by definition; food answers to neither.
 const tempsOf = p => p.temp || (p.cat === 'hot' ? ['hot'] : p.cat === 'cold' ? ['cold'] : []);
@@ -1019,11 +1021,13 @@ const F = n => n.toFixed(3);
 // to eat; coffee asks for something sweet. Each item below names its partner
 // per track, so a suggestion is always a deliberate pairing, never a guess.
 //   refresh  cold drinks      -> savoury
-//   coffee   the coffee list  -> sweet, and savoury while no sweet exists
-//   warm     hot non-coffee   -> sweet, then savoury
+//   coffee   the coffee list  -> sweet   (savoury is honoured as a fallback)
+//   warm     hot non-coffee   -> sweet
 //   savoury  the food list    -> refresh, then coffee
-//   sweet    desserts         -> coffee, then warm      (no item carries it yet)
-const SIDE = p => p.cat === 'food' ? (p.sweet ? 'sweet' : 'savoury')
+//   sweet    the sweets list  -> coffee
+const EATS = p => p.cat === 'food' || p.cat === 'sweets';
+const SIDE = p => p.cat === 'sweets' ? 'sweet'
+  : p.cat === 'food' ? 'savoury'
   : p.cat === 'coffee' ? 'coffee'
   : p.cat === 'hot' ? 'warm' : 'refresh';
 const WANTS = {
@@ -1055,34 +1059,28 @@ const FLAVORS = [
 // price, description or claim is added to it.
 const P = [
 
-  { id: 'pist', with: { savoury: 'sandegg' }, grp: 'flavoured', ar: 'لاتيه بالفستق', en: 'Pistachio latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'saffron', with: { savoury: 'sandegg' }, grp: 'flavoured', ar: 'زعفران لاتيه', en: 'Saffron latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'span', with: { savoury: 'toaster' }, grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'caramel', with: { savoury: 'sandsaus' }, grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'honey', with: { savoury: 'sandegg' }, grp: 'flavoured', ar: 'لاتيه بالعسل', en: 'Honey latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'mangoesp', with: { savoury: 'chips' }, grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
+  { id: 'span', with: { sweet: 'sanseb' }, grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'caramel', with: { sweet: 'sanseb' }, grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'mangoesp', with: { sweet: 'cheesecake' }, grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'latte', with: { savoury: 'sandegg' }, grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'capp', with: { savoury: 'sandsaus' }, grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
-  { id: 'esp', with: { savoury: 'sandegg' }, grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'amer', with: { savoury: 'beef' }, grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'cortado', with: { savoury: 'sandsaus' }, grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'latte', with: { sweet: 'cheesecake' }, grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'capp', with: { sweet: 'sanseb' }, grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'esp', with: { sweet: 'tiramisu' }, grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'amer', with: { sweet: 'cheesecake' }, grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'cortado', with: { sweet: 'tiramisu' }, grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'v60n', with: { savoury: 'beefsp' }, house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
-  { id: 'v60', with: { savoury: 'toaster' }, grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
-  { id: 'cbclassic', with: { savoury: 'chips' }, grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
-  { id: 'cbnefas', with: { savoury: 'chicken' }, house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60n', with: { sweet: 'cheesecake' }, house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60', with: { sweet: 'baklava' }, grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
+  { id: 'cbclassic', with: { sweet: 'tiramisu' }, grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
+  { id: 'cbnefas', with: { sweet: 'sanseb' }, house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'arabic', with: { savoury: 'sandegg' }, grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
-  { id: 'turks', with: { savoury: 'sandegg' }, grp: 'trad', ar: 'قهوة تركية (صغيرة)', en: 'Turkish coffee (Small)', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'turkl', with: { savoury: 'sandsaus' }, grp: 'trad', ar: 'قهوة تركية (كبيرة)', en: 'Turkish coffee (Large)', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'arabic', with: { sweet: 'baklava' }, grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'matchah', with: { savoury: 'sandegg' }, grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
-  { id: 'teanuts', with: { savoury: 'sandsaus' }, grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
-  { id: 'turktea', with: { savoury: 'sandegg' }, grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
-  { id: 'redseed', with: { savoury: 'sandsaus' }, grp: 'hot', ar: 'الحبة الحمراء', en: 'Red Seed Drink', price: 0.5, cat: 'hot' },
+  { id: 'matchah', with: { sweet: 'cheesecake' }, grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
+  { id: 'teanuts', with: { sweet: 'baklava' }, grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
+  { id: 'turktea', with: { sweet: 'baklava' }, grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
   { id: 'salep', grp: 'hot', ar: 'سحلب', en: 'Salep', price: 0.7, cat: 'hot' },
-  { id: 'hotchoc', with: { savoury: 'chips' }, grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
+  { id: 'hotchoc', with: { sweet: 'sanseb' }, grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
 
   { id: 'matchac', with: { savoury: 'toaster' }, grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
   { id: 'mojito', with: { savoury: 'chicken' }, grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
@@ -1095,7 +1093,12 @@ const P = [
   { id: 'chips', with: { refresh: 'rosella', coffee: 'cbclassic' }, grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
   { id: 'sandsaus', wants: ['coffee', 'refresh'], with: { refresh: 'matchac', coffee: 'cortado' }, grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
   { id: 'toaster', with: { refresh: 'matchac', coffee: 'v60' }, grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
-  { id: 'chicken', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' }
+  { id: 'chicken', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' },
+
+  { id: 'sanseb', with: { coffee: 'capp' }, grp: 'sweets', ar: 'سان سباستيان', en: 'San Sebastian', price: 1.3, cat: 'sweets' },
+  { id: 'cheesecake', with: { coffee: 'v60' }, grp: 'sweets', ar: 'تشيز كيك', en: 'Cheesecake', price: 1.3, cat: 'sweets' },
+  { id: 'tiramisu', with: { coffee: 'esp' }, grp: 'sweets', ar: 'تيراميسو', en: 'Tiramisu', price: 1.3, cat: 'sweets' },
+  { id: 'baklava', with: { coffee: 'arabic' }, grp: 'sweets', ar: 'بقلاوة', en: 'Baklava', price: 0.3, cat: 'sweets' }
 ];
 
 const T = {
@@ -1396,8 +1399,8 @@ class Component extends DCLogic {
     // already holds both something to eat and something to drink is left alone.
     const inOrder = Object.keys(s.order).map(k => k.split(':')[1]);
     const held = inOrder.map(id => P.find(x => x.id === id)).filter(Boolean);
-    const hasFood = held.some(x => x.cat === 'food');
-    const hasDrink = held.some(x => x.cat !== 'food');
+    const hasFood = held.some(EATS);
+    const hasDrink = held.some(x => !EATS(x));
     let sug = null;
     if (held.length && !(hasFood && hasDrink)) {
       for (const it of held) {
@@ -1405,7 +1408,7 @@ class Component extends DCLogic {
           .map(side => (it.with || {})[side])
           .map(id => id && P.find(x => x.id === id))
           .find(c => c && oneTap(c) && inOrder.indexOf(c.id) < 0
-                  && (c.cat === 'food') !== hasFood) || null;
+                  && EATS(c) !== hasFood) || null;
         if (sug) break;
       }
     }
