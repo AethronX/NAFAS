@@ -709,6 +709,20 @@ a:hover{color:#5E0A1F}
 
     <div style="padding:12px 18px 4px;font-size:12px;color:#75676A">{{ priceNote }}</div>
 
+    <sc-if value="{{ hasLast }}">
+      <div style="margin:10px 14px 2px;border:1px solid #F0CDD7;border-radius:14px;background:#FDF7F9;padding:13px 15px;display:flex;align-items:center;gap:12px">
+        <span style="flex:1;min-width:0;display:block">
+          <span style="display:block;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8A0F2D;font-weight:600">{{ lastTitle }}</span>
+          <span style="display:block;margin-top:3px;font-size:15px;font-weight:600;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ lastNames }}</span>
+          <span style="display:block;margin-top:2px;font-size:12px;color:#75676A">{{ lastCount }} · {{ lastTotal }}</span>
+        </span>
+        <button sc-camel-on-click="{{ repeatOrder }}" aria-label="{{ repeatAria }}" style="flex:none;min-height:42px;padding:0 15px;display:flex;align-items:center;gap:7px;border:1px solid #8A0F2D;border-radius:11px;background:#fff;color:#8A0F2D;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#8A0F2D;color:#fff">
+          <svg class="i" width="15" height="15" sc-camel-view-box="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"></path><path d="M21 3v6h-6"></path></svg>
+          <span>{{ repeatLabel }}</span>
+        </button>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ noResults }}">
       <div style="padding:56px 32px;text-align:center">
         <span style="display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:#FDF7F9;margin:0 auto;color:#CE8A9B">
@@ -1047,20 +1061,84 @@ const CATS = [
   { key: 'sweets', ar: 'الحلا', en: 'Sweets', icon: I.cake }
 ];
 const GROUPS = {
-  flavoured: { ar: 'قهوة بنكهات', en: 'Flavoured coffee' },
-  espresso: { ar: 'إسبريسو وكلاسيكياته', en: 'Espresso classics' },
-  brew: { ar: 'تحضير مختص وكولد برو', en: 'Specialty & cold brew' },
-  trad: { ar: 'قهوة عربية', en: 'Arabic coffee' },
-  hot: { ar: 'المشروبات الساخنة', en: 'Hot Drinks' },
-  cold: { ar: 'المشروبات الباردة', en: 'Cold Drinks' },
-  food: { ar: 'المأكولات', en: 'Food' },
-  sweets: { ar: 'الحلا', en: 'Sweets' }
+  flavoured: { ar: 'قهوة بنكهات', en: 'Flavoured coffee', alt: 'قهوه كوفي coffee نكهه' },
+  espresso: { ar: 'إسبريسو وكلاسيكياته', en: 'Espresso classics', alt: 'قهوه كوفي coffee' },
+  brew: { ar: 'تحضير مختص وكولد برو', en: 'Specialty & cold brew', alt: 'قهوه كوفي coffee فلتر مقطر filter pour over' },
+  trad: { ar: 'قهوة عربية', en: 'Arabic coffee', alt: 'قهوه كوفي coffee خليجيه عمانيه' },
+  hot: { ar: 'المشروبات الساخنة', en: 'Hot Drinks', alt: 'ساخن حار مشروب hot drink' },
+  cold: { ar: 'المشروبات الباردة', en: 'Cold Drinks', alt: 'عصير عصائر مشروب بارد مثلج juice juices cold iced' },
+  food: { ar: 'المأكولات', en: 'Food', alt: 'اكل طعام وجبه وجبات ساندويتش سندويش food eat snack' },
+  sweets: { ar: 'الحلا', en: 'Sweets', alt: 'حلى حلا حلويات كيك dessert desserts sweet cake' }
 };
 const ORDER = ['flavoured', 'espresso', 'brew', 'trad', 'hot', 'cold', 'food', 'sweets'];
 // Served-temperature filter. Coffees carry their own marks; a hot drink is
 // hot and a cold drink is cold by definition; food answers to neither.
 const tempsOf = p => p.temp || (p.cat === 'hot' ? ['hot'] : p.cat === 'cold' ? ['cold'] : []);
 const F = n => n.toFixed(3);
+
+// What a customer types is never how a menu spells it. Arabic hamza, ta
+// marbuta and alef maqsura vary from writer to writer, spaces land anywhere,
+// and half the souq says ساندويتش where the printed menu says شطيرة. Both the
+// query and the menu are folded to one form before either is compared.
+const fold = t => String(t).toLowerCase()
+  .replace(/[\u064B-\u0652\u0670\u0640]/g, '')
+  .replace(/[أإآٱ]/g, 'ا')
+  .replace(/ة/g, 'ه')
+  .replace(/ى/g, 'ي')
+  .replace(/ؤ/g, 'و')
+  .replace(/ئ/g, 'ي')
+  .replace(/گ/g, 'ك')
+  .replace(/چ/g, 'ج')
+  .replace(/[^a-z0-9\u0621-\u064A ]+/g, ' ')
+  .replace(/ +/g, ' ').trim();
+const squash = t => fold(t).replace(/ /g, '');
+
+// How well a match answers what was typed: the drink itself before the drink
+// that merely shares a section with it.
+const rank = (p, q) => {
+  const ar = squash(p.ar), en = squash(p.en);
+  if (ar === q || en === q) return 0;
+  if (ar.indexOf(q) === 0 || en.indexOf(q) === 0) return 1;
+  if (ar.indexOf(q) >= 0 || en.indexOf(q) >= 0) return 2;
+  if (squash(p.alt || '').indexOf(q) >= 0) return 3;
+  return 4;
+};
+
+// A souq café is three shops in one day: breakfast while the shops open, then
+// the heat, then the evening sitting. The hour only decides which item leads
+// its own section — nothing is hidden, nothing moves section, and no claim is
+// made about anyone else's order. Only about the time.
+const NOW_LEADS = {
+  // the shops opening: breakfast, tea, and the short strong coffees
+  morning: ['sandegg', 'sandsaus', 'turktea', 'arabic', 'esp', 'capp', 'v60',
+            'caramel', 'matchac', 'baklava'],
+  // the heat: cold brew, something tart, a burger
+  afternoon: ['beef', 'beefsp', 'chips', 'rosella', 'mojito', 'cbclassic', 'mangoesp',
+              'amer', 'matchah', 'cheesecake'],
+  // the evening sitting: milk coffee and something sweet with it
+  evening: ['latte', 'span', 'v60n', 'cbnefas', 'hotchoc', 'salep', 'teanuts', 'icetea',
+            'chicken', 'toaster', 'tiramisu', 'sanseb']
+};
+const partOf = h => h < 11 ? 'morning' : h < 16 ? 'afternoon' : 'evening';
+const leadsNow = () => {
+  const h = new Date().getHours();
+  return NOW_LEADS[partOf(isFinite(h) ? h : 12)] || [];
+};
+
+// One edit apart, no more: enough for a dropped letter or a slipped finger,
+// not enough to start matching the wrong drink.
+const near = (a, b) => {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, slips = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++slips > 1) return false;
+    if (a.length > b.length) i++;
+    else if (a.length < b.length) j++;
+    else { i++; j++; }
+  }
+  return slips + (a.length - i) + (b.length - j) <= 1;
+};
 
 // Pairings run on two tracks that never cross. A refresher asks for something
 // to eat; coffee asks for something sweet. The order page then offers that
@@ -1123,46 +1201,46 @@ const FLAVORS = [
 // price, description or claim is added to it.
 const P = [
 
-  { id: 'span', with: { sweet: 'sanseb' }, grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'caramel', with: { sweet: 'sanseb' }, grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'mangoesp', with: { sweet: 'cheesecake' }, grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
+  { id: 'span', alt: 'سبانش condensed', with: { sweet: 'sanseb' }, grp: 'flavoured', ar: 'سبانيش لاتيه', en: 'Spanish latte', price: 1.3, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'caramel', alt: 'كرامل', with: { sweet: 'sanseb' }, grp: 'flavoured', ar: 'كراميل لاتيه', en: 'Caramel latte', price: 1.4, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'mangoesp', alt: 'مانجا مانغو', with: { sweet: 'cheesecake' }, grp: 'flavoured', ar: 'مانجو اسبريسو', en: 'Mango espresso', price: 1.4, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'latte', with: { sweet: 'cheesecake' }, grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'capp', with: { sweet: 'sanseb' }, grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
-  { id: 'esp', with: { sweet: 'tiramisu' }, grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
-  { id: 'amer', with: { sweet: 'cheesecake' }, grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
-  { id: 'cortado', with: { sweet: 'tiramisu' }, grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'latte', alt: 'لاته', with: { sweet: 'cheesecake' }, grp: 'espresso', ar: 'لاتيه', en: 'Latte', price: 1.1, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'capp', alt: 'كابوتشينو كابتشينو', with: { sweet: 'sanseb' }, grp: 'espresso', ar: 'كابتشينو', en: 'Cappuccino', price: 1.0, cat: 'coffee', temp: ['hot'] },
+  { id: 'esp', alt: 'اكسبريسو اسبرسو', with: { sweet: 'tiramisu' }, grp: 'espresso', ar: 'اسبريسو', en: 'Espresso', price: 0.7, cat: 'coffee', temp: ['hot'] },
+  { id: 'amer', alt: 'امريكانو امريكي', with: { sweet: 'cheesecake' }, grp: 'espresso', ar: 'أمريكانو', en: 'Americano', price: 1.0, cat: 'coffee', temp: ['hot', 'cold'] },
+  { id: 'cortado', alt: 'كورتادو', with: { sweet: 'tiramisu' }, grp: 'espresso', ar: 'كرتادو', en: 'Cortado', price: 1.0, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'v60n', with: { sweet: 'cheesecake' }, house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
-  { id: 'v60', with: { sweet: 'baklava' }, grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
-  { id: 'cbclassic', with: { sweet: 'tiramisu' }, grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
-  { id: 'cbnefas', with: { sweet: 'sanseb' }, house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60n', alt: 'في60 فلتر مقطر filter pour over', with: { sweet: 'cheesecake' }, house: true, grp: 'brew', ar: 'V60 نفس', en: 'V60 Nefas', price: 1.8, cat: 'coffee', temp: ['cold'] },
+  { id: 'v60', alt: 'في60 فلتر مقطر filter pour over', with: { sweet: 'baklava' }, grp: 'brew', ar: 'V60', en: 'V60', price: 1.3, cat: 'coffee', temp: ['hot'] },
+  { id: 'cbclassic', alt: 'كولدبرو بارده مثلجه', with: { sweet: 'tiramisu' }, grp: 'brew', ar: 'كولد برو كلاسيك', en: 'Cold bro classic', price: 1.2, cat: 'coffee', temp: ['cold'] },
+  { id: 'cbnefas', alt: 'كولدبرو بارده مثلجه', with: { sweet: 'sanseb' }, house: true, grp: 'brew', ar: 'كولد برو نفس', en: 'Cold bro Nefas', price: 1.5, cat: 'coffee', temp: ['cold'] },
 
-  { id: 'arabic', with: { sweet: 'baklava' }, grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
+  { id: 'arabic', alt: 'قهوه عمانيه خليجيه دله فنجان', with: { sweet: 'baklava' }, grp: 'trad', ar: 'قهوة عربية', en: 'Arabic coffee', price: 1.2, cat: 'coffee', temp: ['hot'] },
 
-  { id: 'matchah', with: { sweet: 'cheesecake' }, grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
-  { id: 'teanuts', with: { sweet: 'baklava' }, grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
-  { id: 'turktea', with: { sweet: 'baklava' }, grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
-  { id: 'salep', grp: 'hot', ar: 'سحلب', en: 'Salep', price: 0.7, cat: 'hot' },
-  { id: 'hotchoc', with: { sweet: 'sanseb' }, grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
+  { id: 'matchah', alt: 'ماتشه شاي اخضر green', with: { sweet: 'cheesecake' }, grp: 'hot', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.2, cat: 'hot' },
+  { id: 'teanuts', alt: 'چاي استكانه مكسرات لوز', with: { sweet: 'baklava' }, grp: 'hot', ar: 'شاي مع مكسرات', en: 'Tea with nuts', price: 0.7, cat: 'hot' },
+  { id: 'turktea', alt: 'چاي استكانه', with: { sweet: 'baklava' }, grp: 'hot', ar: 'شاي تركي', en: 'Turkish tea', price: 0.2, cat: 'hot' },
+  { id: 'salep', alt: 'صحلب', grp: 'hot', ar: 'سحلب', en: 'Salep', price: 0.7, cat: 'hot' },
+  { id: 'hotchoc', alt: 'شوكولاته شوكولا شوكلاته كاكاو cocoa', with: { sweet: 'sanseb' }, grp: 'hot', ar: 'هوت شوكلت', en: 'Hot chocolate', price: 1.0, cat: 'hot' },
 
-  { id: 'matchac', with: { savoury: 'toaster' }, grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
-  { id: 'mojito', with: { savoury: 'chicken' }, grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
-  { id: 'rosella', with: { savoury: 'beef' }, grp: 'cold', ar: 'كركديه', en: 'Rosella', price: 1.0, cat: 'cold' },
-  { id: 'icetea', with: { savoury: 'beefsp' }, grp: 'cold', ar: 'آيس تي', en: 'Ice Tea', price: 1.0, cat: 'cold', flavors: true },
+  { id: 'matchac', alt: 'ماتشه شاي اخضر green', with: { savoury: 'toaster' }, grp: 'cold', ar: 'ماتشا لاتيه', en: 'Matcha Latte', price: 1.3, cat: 'cold' },
+  { id: 'mojito', alt: 'موخيتو موهيتوا', with: { savoury: 'chicken' }, grp: 'cold', ar: 'موهيتو', en: 'Mojito', price: 0.9, cat: 'cold', flavors: true },
+  { id: 'rosella', alt: 'كركدي حبشي hibiscus', with: { savoury: 'beef' }, grp: 'cold', ar: 'كركديه', en: 'Rosella', price: 1.0, cat: 'cold' },
+  { id: 'icetea', alt: 'ايستي شاي مثلج', with: { savoury: 'beefsp' }, grp: 'cold', ar: 'آيس تي', en: 'Ice Tea', price: 1.0, cat: 'cold', flavors: true },
 
-  { id: 'beefsp', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر لحم طازج سبشل', en: 'Special Fresh Beef Burger', price: 1.0, cat: 'food' },
-  { id: 'beef', with: { refresh: 'rosella', coffee: 'cbclassic' }, grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
-  { id: 'sandegg', wants: ['coffee', 'refresh'], with: { refresh: 'matchac', coffee: 'capp' }, grp: 'food', ar: 'شطيرة بيض وجبن وبطاطس', en: 'Egg, cheese and chips Sandwich', price: 0.7, cat: 'food' },
-  { id: 'chips', with: { refresh: 'rosella', coffee: 'cbclassic' }, grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
-  { id: 'sandsaus', wants: ['coffee', 'refresh'], with: { refresh: 'matchac', coffee: 'cortado' }, grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
-  { id: 'toaster', with: { refresh: 'matchac', coffee: 'v60' }, grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
-  { id: 'chicken', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' },
+  { id: 'beefsp', alt: 'برغر همبرجر لحمه سبيشل special', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر لحم طازج سبشل', en: 'Special Fresh Beef Burger', price: 1.0, cat: 'food' },
+  { id: 'beef', alt: 'برغر همبرجر لحمه', with: { refresh: 'rosella', coffee: 'cbclassic' }, grp: 'food', ar: 'برجر لحم طازج', en: 'Fresh Beef Burger', price: 0.9, cat: 'food' },
+  { id: 'sandegg', alt: 'ساندويتش سندويش سندوتش بيضه جبنه', wants: ['coffee', 'refresh'], with: { refresh: 'matchac', coffee: 'capp' }, grp: 'food', ar: 'شطيرة بيض وجبن وبطاطس', en: 'Egg, cheese and chips Sandwich', price: 0.7, cat: 'food' },
+  { id: 'chips', alt: 'بطاطا فرايز فرنش fries french', with: { refresh: 'rosella', coffee: 'cbclassic' }, grp: 'food', ar: 'بطاطس مقلية', en: 'Fried Chips', price: 0.5, cat: 'food' },
+  { id: 'sandsaus', alt: 'ساندويتش سندويش سندوتش بيضه سجق نقانق sausage', wants: ['coffee', 'refresh'], with: { refresh: 'matchac', coffee: 'cortado' }, grp: 'food', ar: 'شطيرة بيض ونقانق', en: 'Egg and Sausage Sandwich', price: 0.8, cat: 'food' },
+  { id: 'toaster', alt: 'ساندويتش سندويش توست تصت دجاج فراخ', with: { refresh: 'matchac', coffee: 'v60' }, grp: 'food', ar: 'توستر دجاج', en: 'Chicken Toaster Sandwich', price: 0.9, cat: 'food' },
+  { id: 'chicken', alt: 'برغر همبرجر دجاج فراخ crispy', with: { refresh: 'rosella', coffee: 'cbnefas' }, grp: 'food', ar: 'برجر دجاج كريسبي', en: 'Crispy Chicken Burger', price: 1.0, cat: 'food' },
 
-  { id: 'sanseb', with: { coffee: 'capp' }, grp: 'sweets', ar: 'سان سباستيان', en: 'San Sebastian', price: 1.3, cat: 'sweets' },
-  { id: 'cheesecake', with: { coffee: 'v60' }, grp: 'sweets', ar: 'تشيز كيك', en: 'Cheesecake', price: 1.3, cat: 'sweets' },
-  { id: 'tiramisu', with: { coffee: 'esp' }, grp: 'sweets', ar: 'تيراميسو', en: 'Tiramisu', price: 1.3, cat: 'sweets' },
-  { id: 'baklava', with: { coffee: 'arabic' }, grp: 'sweets', ar: 'بقلاوة', en: 'Baklava', price: 0.3, cat: 'sweets' }
+  { id: 'sanseb', alt: 'باسك باسكيه بسك basque burnt cheesecake تشيزكيك', with: { coffee: 'capp' }, grp: 'sweets', ar: 'سان سباستيان', en: 'San Sebastian', price: 1.3, cat: 'sweets' },
+  { id: 'cheesecake', alt: 'تشيزكيك جبن جبنه', with: { coffee: 'v60' }, grp: 'sweets', ar: 'تشيز كيك', en: 'Cheesecake', price: 1.3, cat: 'sweets' },
+  { id: 'tiramisu', alt: 'تراميسو تيرامسو', with: { coffee: 'esp' }, grp: 'sweets', ar: 'تيراميسو', en: 'Tiramisu', price: 1.3, cat: 'sweets' },
+  { id: 'baklava', alt: 'بكلاوه بقلاوه', with: { coffee: 'arabic' }, grp: 'sweets', ar: 'بقلاوة', en: 'Baklava', price: 0.3, cat: 'sweets' }
 ];
 
 const T = {
@@ -1176,7 +1254,7 @@ const T = {
     total: 'الإجمالي', clearOrder: 'تفريغ الطلب', clearConfirm: 'اضغط مرة أخرى للتأكيد', addMore: 'أضف المزيد',
     item1: 'صنف', item2: 'صنفان', itemN: 'أصناف',
     orderNote: 'راجع الكميات والإجمالي قبل أن تطلب.',
-    suggestTitle: 'جرّبه مع',
+    suggestTitle: 'جرّبه مع', lastTitle: 'طلبك السابق', repeatOrder: 'أعِد الطلب',
     a11ySearch: 'ابحث في المنيو', a11yClearSearch: 'مسح البحث', a11yClose: 'إغلاق',
     a11yInc: 'زيادة الكمية', a11yDec: 'إنقاص الكمية',
     a11yFlavorDialog: 'اختيار النكهة', a11yOrderDialog: 'طلبي',
@@ -1198,7 +1276,7 @@ const T = {
     total: 'Total', clearOrder: 'Clear order', clearConfirm: 'Tap again to confirm', addMore: 'Add more',
     item1: 'item', item2: 'items', itemN: 'items',
     orderNote: 'Check the quantities and total before you order.',
-    suggestTitle: 'Try it with',
+    suggestTitle: 'Try it with', lastTitle: 'Your last order', repeatOrder: 'Order it again',
     a11ySearch: 'Search the menu', a11yClearSearch: 'Clear search', a11yClose: 'Close',
     a11yInc: 'Increase quantity', a11yDec: 'Decrease quantity',
     a11yFlavorDialog: 'Choose a flavour', a11yOrderDialog: 'My order',
@@ -1213,7 +1291,7 @@ const T = {
 };
 
 class Component extends DCLogic {
-  state = { lang: 'ar', cat: 'all', query: '', flavorFor: null,
+  state = { lang: 'ar', cat: 'all', query: '', flavorFor: null, last: null,
             order: {}, sugSide: null, orderOpen: false, clearArm: false, headerH: 150 };
   headerRef = React.createRef();
 
@@ -1287,19 +1365,40 @@ class Component extends DCLogic {
     try { localStorage.setItem('nafas.order', JSON.stringify({ t: Date.now(), order, side })); }
     catch (e) {}
   }
+  // keep only what the menu could have written, at a quantity it could have
+  // counted to
+  cleanOrder(raw) {
+    const clean = {};
+    for (const k of Object.keys(Object(raw))) {
+      if (!readKey(k)) continue;
+      const n = Math.floor(Number(raw[k]));
+      if (Number.isFinite(n) && n > 0) clean[k] = Math.min(n, MAX_QTY);
+    }
+    return Object.keys(clean).length ? clean : null;
+  }
+  // The order before this one, kept for a month on this device alone. A regular
+  // orders the same thing, and this turns that into one tap instead of six. It
+  // is this phone's own history, not a claim about anybody else.
+  KEEP_LAST = 30 * 24 * 60 * 60 * 1000;
+  saveLast(order) {
+    try {
+      if (Object.keys(order).length)
+        localStorage.setItem('nafas.last', JSON.stringify({ t: Date.now(), order }));
+    } catch (e) {}
+  }
+  loadLast() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('nafas.last') || 'null');
+      if (!raw || Date.now() - raw.t > this.KEEP_LAST) return null;
+      return this.cleanOrder(raw.order);
+    } catch (e) { return null; }
+  }
   loadOrder() {
     try {
       const raw = JSON.parse(localStorage.getItem('nafas.order') || 'null');
       if (!raw || Date.now() - raw.t > this.KEEP) return null;
-      // keep only what the menu could have written, at a quantity it could
-      // have counted to
-      const clean = {};
-      for (const k of Object.keys(Object(raw.order))) {
-        if (!readKey(k)) continue;
-        const n = Math.floor(Number(raw.order[k]));
-        if (Number.isFinite(n) && n > 0) clean[k] = Math.min(n, MAX_QTY);
-      }
-      if (!Object.keys(clean).length) return null;
+      const clean = this.cleanOrder(raw.order);
+      if (!clean) return null;
       return { order: clean, side: CAT_OF[raw.side] ? raw.side : null };
     } catch (e) { return null; }
   }
@@ -1313,6 +1412,7 @@ class Component extends DCLogic {
     window.addEventListener('hashchange', this.applyRoute);
     const kept = this.loadOrder();
     if (kept) this.setState({ order: kept.order, sugSide: this.sideFor(kept.order, kept.side) });
+    this.setState({ last: this.loadLast() });
     if (location.hash) this.applyRoute(); else this._route = this.routeOf(this.state);
     window.addEventListener('keydown', this.onKey);
     this.measure();
@@ -1367,6 +1467,7 @@ class Component extends DCLogic {
     if (this._saved !== this.state.order) {
       this._saved = this.state.order;
       this.saveOrder(this.state.order, this.state.sugSide);
+      this.saveLast(this.state.order);
     }
 
     const lock = !!(this.state.orderOpen || this.state.flavorFor);
@@ -1482,21 +1583,37 @@ class Component extends DCLogic {
     const s = this.state;
     const l = s.lang;
     const t = T[l];
-    const q = s.query.trim().toLowerCase();
+    const q = squash(s.query);
+    const hay = p => [p.ar, p.en, p.alt || '', GROUPS[p.grp].ar, GROUPS[p.grp].en,
+                      GROUPS[p.grp].alt || ''].join(' ');
 
-    const matches = P.filter(p => {
-      if (q) return [p.ar, p.en, GROUPS[p.grp].ar, GROUPS[p.grp].en].join(' ').toLowerCase().includes(q);
-      return s.cat === 'all' || p.cat === s.cat;
-    });
-    const sections = ORDER.map(g => {
-      const items = matches.filter(p => p.grp === g);
+    let matches;
+    if (!q) matches = P.filter(p => s.cat === 'all' || p.cat === s.cat);
+    else {
+      matches = P.filter(p => squash(hay(p)).includes(q));
+      // only when nothing matched outright, so a typo never adds noise to a
+      // search that was already working
+      if (!matches.length && q.length >= 4)
+        matches = P.filter(p => fold(hay(p)).split(' ').some(w => near(w, q)));
+    }
+    // Browsing keeps the menu's own order, with the hour floating a few items
+    // to the front of their section. A search answers by relevance instead,
+    // and the section that answers best comes first.
+    const now = q ? null : leadsNow();
+    const sort = items => q
+      ? items.slice().sort((a, b) => rank(a, q) - rank(b, q))
+      : items.slice().sort((a, b) => (now.indexOf(a.id) + 1 || 99) - (now.indexOf(b.id) + 1 || 99));
+    let sections = ORDER.map(g => {
+      const items = sort(matches.filter(p => p.grp === g));
       if (!items.length) return null;
       return {
+        best: q ? rank(items[0], q) : 0,
         title: l === 'ar' ? GROUPS[g].ar : GROUPS[g].en,
         en: l === 'ar' ? GROUPS[g].en : GROUPS[g].ar,
         items: items.map(p => this.card(p, l, t))
       };
     }).filter(Boolean);
+    if (q) sections = sections.sort((a, b) => a.best - b.best);
 
     // The whole section that answers what the basket opened with: order a
     // coffee and the sweets come back, order something cold and the food does.
@@ -1565,6 +1682,22 @@ class Component extends DCLogic {
         pick: () => { this.bump('p:' + fp.id + '::' + i, 1); this.setState({ flavorFor: null }); }
       })) : [],
       closeFlavor: () => this.setState({ flavorFor: null }),
+
+      // The order before this one, offered back in one tap while the basket is
+      // still empty. It is this device's own history and nothing else.
+      hasLast: !!(s.last && !orderCount && !q),
+      lastTitle: t.lastTitle,
+      lastNames: s.last ? Object.keys(s.last).map(k => (this.lineOf(k, l) || {}).name)
+        .filter(Boolean).filter((n, i, a) => a.indexOf(n) === i).join(' · ') : '',
+      lastCount: s.last ? this.countLabel(
+        Object.values(s.last).reduce((a, n) => a + n, 0), t) : '',
+      lastTotal: s.last ? F(Object.keys(s.last).reduce((a, k) => {
+        const line = this.lineOf(k, l); return line ? a + line.price * s.last[k] : a; }, 0)) : '',
+      repeatLabel: t.repeatOrder,
+      repeatAria: s.last ? t.repeatOrder + ': ' + Object.keys(s.last)
+        .map(k => (this.lineOf(k, l) || {}).name).filter(Boolean).join(' · ') : '',
+      repeatOrder: () => { if (s.last) this.setState({
+        order: { ...s.last }, sugSide: this.sideFor(s.last, null), orderOpen: true }); },
 
       hasSuggestion: sugItems.length > 0,
       suggestTitle: t.suggestTitle,

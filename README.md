@@ -21,7 +21,7 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 - ٣٣ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٣)، المشروبات الساخنة (٥)، المشروبات الباردة (٤)، المأكولات (٧)، الحلا (٤) — 33 items transcribed from the café's printed menu
 - تبديل اللغة بين العربية والإنجليزية مع دعم RTL كامل — Arabic/English toggle with full RTL support
 - رفّ اقتراح في صفحة الطلب يعرض القسم المكمّل كاملاً على مسارين منفصلين: المشروبات الباردة ↔ المأكولات، والقهوة ↔ الحلا — a shelf on the order page offering the whole complementary section, on two separate tracks: cold drinks ↔ food, and coffee ↔ sweets
-- بحث فوري في الأسماء والأقسام — instant search across names and sections
+- بحث يقرأ ما يكتبه الزبون فعلاً: توحيد الهمزة والتاء المربوطة والألف المقصورة، وتجاهل المسافات، ومرادفات السوق (ساندويتش، عصير، حلويات، برغر)، وتسامح مع خطأ حرف واحد — search that reads what a customer actually types: Arabic letter folding, spacing ignored, the words the souq uses, and a one-letter typo forgiven
 - تجميع مشروبات القهوة في أربع مجموعات (بنكهات · إسبريسو · تحضير مختص · عربية) لتقليل عبء الاختيار — the 13 coffees grouped into four, to cut choice overload
 - عدّاد كمية داخل الصف: التعديل بضغطة واحدة بلا مغادرة المكان — an in-row stepper: one tap to adjust, without leaving your place
 - علامات «ساخن / بارد» كما في المنيو المطبوع — the printed menu's hot/cold marks
@@ -118,3 +118,24 @@ The order page's suggestion runs on two tracks that never cross. Every item name
 - **Quantity is capped at 99.**
 - **Anything read back from a device is checked against the menu** by `readKey()` — the item must still be on it, a temperature only where the menu serves both ways, a flavour only where it lists them, and a whole positive quantity. Anything else is dropped rather than shown or allowed to break the page.
 - **`#/order` on an empty basket** opens the menu, not a zero order page.
+
+## ما يرفع المبيعات / What moves the order
+
+ثلاث آليات، كلها مبنية على شيء صحيح — لا ادّعاء عن طلبات الآخرين ولا ندرة مصطنعة:
+
+Three mechanisms, each built on something true — no claim about anyone else's order, no manufactured scarcity:
+
+**١. الرفّ المكمّل في صفحة الطلب** — القسم المقابل كاملاً على مسار الصنف الذي فتح الطلب، ويثبت عليه.
+**The complementary shelf** on the order page: the whole opposite section, on the track of the item that opened the order, and held there.
+
+**٢. ترتيب الساعة** — `NOW_LEADS` يطفو أصنافاً إلى صدارة قسمها حسب وقت اليوم: الفطور والشاي صباحاً (قبل ١١)، البارد والبرجر في الظهيرة (١١–١٦)، القهوة بالحليب والحلا مساءً. لا يُخفى شيء ولا يتحرّك قسم، والادّعاء الوحيد هو عن الساعة.
+**The hour** floats items to the front of their own section — breakfast and tea before 11, cold drinks and burgers 11–16, milk coffee and sweets after. Nothing is hidden, no section moves, and the only claim made is about the time.
+
+**٣. «طلبك السابق»** — يُحفظ على جهاز الزبون شهراً، ويُعرض وحده حين تكون السلة فارغة، فيعيد طلب الزبون المعتاد بضغطة واحدة بدل ست. يمرّ على `readKey()` فلا يعود صنف حُذف من المنيو.
+**Your last order** is kept on the customer's own device for a month and offered back only while the basket is empty — a regular's usual in one tap instead of six. It goes through `readKey()`, so nothing struck off the menu comes back.
+
+### ما لا يستطيع هذا الملف معرفته / What this file cannot know
+
+لا توجد هنا أي بيانات مبيعات من المقهى. ترتيب `NOW_LEADS` و`with` اجتهاد قائم على وقت اليوم وعلى ما يناسب ما يناسبه، لا على ما طلبه الناس فعلاً. تفعيل Vercel Web Analytics (انظر قسم القياس) هو ما يحوّل الاجتهاد إلى قياس.
+
+There is no sales data from the café in here. `NOW_LEADS` and the `with` pairings are judgement about the hour and about what goes with what — not about what anyone ordered. Turning on Vercel Web Analytics is what turns the judgement into measurement.
