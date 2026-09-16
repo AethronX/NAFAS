@@ -20,7 +20,7 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 
 - ٣٣ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٣)، المشروبات الساخنة (٥)، المشروبات الباردة (٤)، المأكولات (٧)، الحلا (٤) — 33 items transcribed from the café's printed menu
 - تبديل اللغة بين العربية والإنجليزية مع دعم RTL كامل — Arabic/English toggle with full RTL support
-- اقتراح واحد في صفحة الطلب على مسارين منفصلين: المشروبات الباردة ↔ المأكولات، والقهوة ↔ الحلا — one suggestion on the order page, on two separate tracks: cold drinks ↔ food, and coffee ↔ sweets
+- رفّ اقتراح في صفحة الطلب يعرض القسم المكمّل كاملاً على مسارين منفصلين: المشروبات الباردة ↔ المأكولات، والقهوة ↔ الحلا — a shelf on the order page offering the whole complementary section, on two separate tracks: cold drinks ↔ food, and coffee ↔ sweets
 - بحث فوري في الأسماء والأقسام — instant search across names and sections
 - تجميع مشروبات القهوة في أربع مجموعات (بنكهات · إسبريسو · تحضير مختص · عربية) لتقليل عبء الاختيار — the 13 coffees grouped into four, to cut choice overload
 - عدّاد كمية داخل الصف: التعديل بضغطة واحدة بلا مغادرة المكان — an in-row stepper: one tap to adjust, without leaving your place
@@ -88,13 +88,18 @@ The order page's suggestion runs on two tracks that never cross. Every item name
 { id: 'baklava', with: { coffee: 'arabic' } }                         // حلا → قهوة
 ```
 
-- الأطراف: `refresh` المشروبات الباردة، `warm` المشروبات الساخنة، `coffee` مشروبات القهوة، `savoury` المأكولات، `sweet` الحلا. كل صنف يأخذ طرفه من `cat`.
-- `WANTS` يحدّد ترتيب ما يطلبه كل طرف. القهوة والساخن يطلبان `sweet` ثم `savoury`، فلو حُذف الحلا يوماً يكفي إضافة `savoury: '<id>'` ليعود المسار البديل.
-- `wants` تقلب الترتيب لصنف واحد: شطيرتا البيض تطلبان القهوة قبل البارد.
-- الاقتراح يجب أن يُضاف بضغطة واحدة، و`oneTap()` يستبعد تلقائياً كل صنف يسأل عن نكهة أو عن ساخن/بارد أولاً — لا تُختار الأهداف يدوياً.
-- سحلب بلا شريك عمداً.
+`with` يسمّي الصنف الذي يتصدّر الرفّ، والرفّ يعرض قسمه كاملاً.
+`with` names the item that leads the shelf; the shelf shows that item's whole section.
 
-- Sides come from `cat`; `WANTS` sets what each side asks for, in order.
-- Coffee and hot drinks ask for `sweet` then `savoury`, so removing the sweets only needs a `savoury: '<id>'` to restore the fallback.
-- A suggestion must land in one tap, and `oneTap()` enforces that in code — it excludes anything that would first ask for a flavour or a temperature, so targets are never hand-vetted.
-- `wants` flips the order for a single item: the two egg sandwiches ask for coffee before a cold drink. Salep is deliberately unpaired.
+- الأطراف: `refresh` المشروبات الباردة، `warm` المشروبات الساخنة، `coffee` مشروبات القهوة، `savoury` المأكولات، `sweet` الحلا. كل صنف يأخذ طرفه من `cat`، و`CAT_OF` يحوّل الطرف إلى قسم كامل من المنيو.
+- **الرفّ يعرض القسم كاملاً**، لا صنفاً واحداً. أول صنف في السلة هو الذي يحدّد القسم، فلا يتبدّل الرفّ تحت إصبعك وأنت تضيف منه.
+- `with` لم يعد يختار الاقتراح وإنما يحدّد **الصنف الذي يتصدّر الرفّ**: اسبريسو يضع التيراميسو أولاً، والقهوة العربية تضع البقلاوة أولاً.
+- `WANTS` يحدّد ترتيب ما يطلبه كل طرف. القهوة والساخن يطلبان `sweet` ثم `savoury`، فلو حُذف الحلا يوماً عاد المسار البديل وحده.
+- `wants` تقلب الترتيب لصنف واحد: شطيرتا البيض تطلبان القهوة قبل البارد.
+- صفوف الرفّ هي صفوف المنيو نفسها: عدّاد كمية، وزرّا ساخن/بارد لما يُقدَّم بالوجهين، ونافذة النكهة للآيس تي والموهيتو — تفتح فوق صفحة الطلب على المسار `#/order/choose/<id>` ويعيدها زر الرجوع إلى الطلب لا إلى المنيو.
+
+- The shelf offers the **whole section**, not one item. The basket's first item picks it, so it never changes section under your finger as you add from it.
+- `with` no longer picks the suggestion; it picks **which item leads the shelf** — espresso puts the tiramisu first, Arabic coffee puts the baklava first.
+- `WANTS` sets what each side asks for, in order. Coffee and hot drinks ask for `sweet` then `savoury`, so removing the sweets restores the fallback on its own.
+- `wants` flips the order for a single item: the two egg sandwiches ask for coffee before a cold drink.
+- Shelf rows are the menu's own rows — stepper, hot/cold buttons, and the flavour sheet, which opens above the order page at `#/order/choose/<id>` and whose back button returns to the order, not the menu.

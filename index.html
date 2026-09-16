@@ -841,7 +841,7 @@ a:hover{color:#5E0A1F}
   </sc-if>
 
   <sc-if value="{{ flavorOpen }}">
-    <div dir="{{ dir }}" role="dialog" aria-modal="true" aria-label="{{ a11yFlavorDialog }}" style="position:fixed;inset:0;z-index:40;background:rgba(46,4,16,0.52);display:flex;flex-direction:column;justify-content:flex-end;animation:fade 160ms ease-out">
+    <div dir="{{ dir }}" role="dialog" aria-modal="true" aria-label="{{ a11yFlavorDialog }}" style="position:fixed;inset:0;z-index:60;background:rgba(46,4,16,0.52);display:flex;flex-direction:column;justify-content:flex-end;animation:fade 160ms ease-out">
       <div sc-camel-on-click="{{ closeFlavor }}" style="flex:1;cursor:pointer"></div>
       <div style="max-width:520px;width:100%;margin:0 auto;background:#fff;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--e3);animation:rise 250ms ease-out">
         <div style="display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid #E9DDE1">
@@ -917,19 +917,65 @@ a:hover{color:#5E0A1F}
       </div>
 
       <sc-if value="{{ hasSuggestion }}">
-        <div style="flex:none;padding:12px 18px 13px;border-bottom:1px solid #E9DDE1;background:#fff">
-          <div style="font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8A0F2D;font-weight:600">{{ suggestTitle }}</div>
-          <div style="display:flex;align-items:center;gap:12px;margin-top:7px">
-            <span style="flex:1;min-width:0;display:block">
-              <span style="display:block;font-size:16px;font-weight:600;line-height:1.4">{{ suggestName }}</span>
-              <span dir="{{ subDir }}" style="display:block;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:#75676A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ suggestSub }}</span>
-            </span>
-            <span style="flex:none;display:inline-flex;align-items:center;font-family:Archivo,sans-serif;font-weight:800;font-size:17px;color:#24191B;white-space:nowrap">{{ suggestPrice }}<span aria-hidden="true" class="omr"></span></span>
-            <button sc-camel-on-click="{{ suggestAdd }}" aria-label="{{ suggestAria }}" style="flex:none;min-height:40px;padding:0 15px;display:flex;align-items:center;gap:7px;border:1px solid #8A0F2D;border-radius:10px;background:#fff;color:#8A0F2D;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#8A0F2D;color:#fff">
-              <svg class="i" width="15" height="15" sc-camel-view-box="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
-              <span>{{ suggestLabel }}</span>
-            </button>
+        <div style="flex:none;border-bottom:1px solid #E9DDE1">
+          <div style="background:#FDF7F9;border-top:1px solid #E9DDE1;border-bottom:1px solid #E9DDE1;padding:13px 18px 11px;display:flex;align-items:baseline;gap:9px" style-before="content:'';display:block;flex:none;align-self:center;width:3px;height:17px;border-radius:999px;background:#8A0F2D">
+            <span style="flex:none;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8A0F2D;font-weight:600">{{ suggestTitle }}</span>
+            <h2 style="font-size:16px;font-weight:700;white-space:nowrap">{{ suggestSection }}</h2>
+            <span dir="{{ subDir }}" style="min-width:0;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#75676A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ suggestSectionSub }}</span>
           </div>
+          <sc-for list="{{ suggestItems }}" as="p" hint-placeholder-count="4">
+            <div style="padding:12px 18px;border-bottom:1px solid #F8E7EC;background:#fff">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="flex:1;min-width:0;display:block">
+                <span style="display:block;font-size:16px;font-weight:600;line-height:1.4">{{ p.name }}</span>
+                <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px">
+                  <span dir="{{ subDir }}" style="min-width:0;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:#75676A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.sub }}</span>
+                  <sc-for list="{{ p.temps }}" as="tp" hint-placeholder-count="2">
+                    <span style="flex:none;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;background:#FDF7F9;color:#5E0A1F;border:1px solid #F0CDD7;white-space:nowrap">{{ tp }}</span>
+                  </sc-for>
+                  <sc-if value="{{ p.house }}">
+                    <span style="flex:none;font-size:11px;font-weight:700;padding:1px 9px;border-radius:999px;background:#8A0F2D;color:#fff;white-space:nowrap">{{ p.houseLabel }}</span>
+                  </sc-if>
+                </span>
+              </span>
+              <span style="flex:none;display:inline-flex;align-items:center;font-family:Archivo,sans-serif;font-weight:800;font-size:17px;letter-spacing:-.01em;color:#24191B;white-space:nowrap">{{ p.priceLabel }}</span>
+              <sc-if value="{{ p.stepper }}">
+                <span style="flex:none;display:flex;align-items:center;gap:1px;border:1px solid #8A0F2D;border-radius:999px;padding:2px;background:#F8E7EC">
+                  <button sc-camel-on-click="{{ p.dec }}" aria-label="{{ a11yDec }}" style="width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:999px;background:none;cursor:pointer;color:#8A0F2D" style-hover="background:#fff">
+                    <svg class="i" width="15" height="15" sc-camel-view-box="0 0 24 24"><path d="M5 12h14"></path></svg>
+                  </button>
+                  <span style="min-width:20px;text-align:center;font-family:Archivo,sans-serif;font-weight:800;font-size:15px;color:#5E0A1F">{{ p.qty }}</span>
+                  <button sc-camel-on-click="{{ p.add }}" aria-label="{{ p.addAria }}" style="width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:999px;background:none;cursor:pointer;color:#8A0F2D" style-hover="background:#fff">
+                    <svg class="i" width="15" height="15" sc-camel-view-box="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                  </button>
+                </span>
+              </sc-if>
+              <sc-if value="{{ p.plain }}">
+                <span style="flex:none;display:flex;align-items:center;gap:8px">
+                  <sc-if value="{{ p.qty }}">
+                    <span style="flex:none;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#8A0F2D;color:#fff;display:grid;place-items:center;font-family:Archivo,sans-serif;font-weight:800;font-size:13px">{{ p.qty }}</span>
+                  </sc-if>
+                  <button sc-camel-on-click="{{ p.add }}" aria-label="{{ p.addAria }}" style="flex:none;width:40px;height:40px;display:grid;place-items:center;border:1px solid #E9DDE1;border-radius:999px;background:#fff;cursor:pointer;color:#8A0F2D;transition:background 160ms,border-color 160ms" style-hover="background:#8A0F2D;border-color:#8A0F2D;color:#fff">
+                    <svg class="i" width="17" height="17" sc-camel-view-box="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                  </button>
+                </span>
+              </sc-if>
+            </div>
+            <sc-if value="{{ p.hasVariants }}">
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <sc-for list="{{ p.variants }}" as="v" hint-placeholder-count="2">
+                  <button sc-camel-on-click="{{ v.add }}" aria-label="{{ v.aria }}" style="flex:1;min-height:42px;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid {{ v.border }};border-radius:11px;background:{{ v.bg }};color:{{ v.color }};font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background 160ms,border-color 160ms" style-hover="border-color:#8A0F2D">
+                    <svg class="i" width="15" height="15" sc-camel-view-box="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                    <span>{{ v.label }}</span>
+                    <sc-if value="{{ v.hasQty }}">
+                      <span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.24);display:grid;place-items:center;font-family:Archivo,sans-serif;font-weight:800;font-size:12px">{{ v.qty }}</span>
+                    </sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+            </div>
+          </sc-for>
         </div>
       </sc-if>
 
@@ -1018,14 +1064,13 @@ const tempsOf = p => p.temp || (p.cat === 'hot' ? ['hot'] : p.cat === 'cold' ? [
 const F = n => n.toFixed(3);
 
 // Pairings run on two tracks that never cross. A refresher asks for something
-// to eat; coffee asks for something sweet. Each item below names its partner
-// per track, so a suggestion is always a deliberate pairing, never a guess.
+// to eat; coffee asks for something sweet. The order page then offers that
+// whole section, led by the partner the item names for itself below.
 //   refresh  cold drinks      -> savoury
 //   coffee   the coffee list  -> sweet   (savoury is honoured as a fallback)
 //   warm     hot non-coffee   -> sweet
 //   savoury  the food list    -> refresh, then coffee
 //   sweet    the sweets list  -> coffee
-const EATS = p => p.cat === 'food' || p.cat === 'sweets';
 const SIDE = p => p.cat === 'sweets' ? 'sweet'
   : p.cat === 'food' ? 'savoury'
   : p.cat === 'coffee' ? 'coffee'
@@ -1040,9 +1085,8 @@ const WANTS = {
 // An egg sandwich reaches for the coffee first; everything else on the food
 // list reaches for the cold drink first.
 const wantsOf = p => p.wants || WANTS[SIDE(p)];
-// A suggestion has to land in the basket in one tap, so anything that would
-// first ask for a flavour or a temperature can never be suggested.
-const oneTap = p => !p.flavors && tempsOf(p).length < 2;
+// Each side is a section of the menu, offered whole.
+const CAT_OF = { sweet: 'sweets', savoury: 'food', coffee: 'coffee', warm: 'hot', refresh: 'cold' };
 
 // Served-temperature marks, transcribed from the printed menu's hot/cold icons.
 const TEMP = { hot: { ar: 'ساخن', en: 'Hot' }, cold: { ar: 'بارد', en: 'Cold' } };
@@ -1112,7 +1156,7 @@ const T = {
     total: 'الإجمالي', clearOrder: 'تفريغ الطلب', clearConfirm: 'اضغط مرة أخرى للتأكيد', addMore: 'أضف المزيد',
     item1: 'صنف', item2: 'صنفان', itemN: 'أصناف',
     orderNote: 'راجع الكميات والإجمالي قبل أن تطلب.',
-    suggestTitle: 'جرّبه مع', suggestAdd: 'أضف',
+    suggestTitle: 'جرّبه مع',
     a11ySearch: 'ابحث في المنيو', a11yClearSearch: 'مسح البحث', a11yClose: 'إغلاق',
     a11yInc: 'زيادة الكمية', a11yDec: 'إنقاص الكمية',
     a11yFlavorDialog: 'اختيار النكهة', a11yOrderDialog: 'طلبي',
@@ -1134,7 +1178,7 @@ const T = {
     total: 'Total', clearOrder: 'Clear order', clearConfirm: 'Tap again to confirm', addMore: 'Add more',
     item1: 'item', item2: 'items', itemN: 'items',
     orderNote: 'Check the quantities and total before you order.',
-    suggestTitle: 'Try it with', suggestAdd: 'Add',
+    suggestTitle: 'Try it with',
     a11ySearch: 'Search the menu', a11yClearSearch: 'Clear search', a11yClose: 'Close',
     a11yInc: 'Increase quantity', a11yDec: 'Decrease quantity',
     a11yFlavorDialog: 'Choose a flavour', a11yOrderDialog: 'My order',
@@ -1177,7 +1221,7 @@ class Component extends DCLogic {
   // Browsing replaces the entry so back does not walk through every category
   // you tapped; a dialog pushes one so back closes it.
   routeOf(st) {
-    if (st.orderOpen) return '/order';
+    if (st.orderOpen) return st.flavorFor ? '/order/choose/' + st.flavorFor : '/order';
     if (st.flavorFor) return '/choose/' + st.flavorFor;
     if (st.query.trim()) return '/search/' + encodeURIComponent(st.query.trim());
     return '/' + st.cat;
@@ -1187,6 +1231,11 @@ class Component extends DCLogic {
     const base = { cat: 'all', query: '', orderOpen: false, flavorFor: null };
     let next;
     if (h === '/order') next = { ...base, cat: this.state.cat, orderOpen: true };
+    else if (h.indexOf('/order/choose/') === 0) {
+      const id = h.slice(14);
+      next = { ...base, cat: this.state.cat, orderOpen: true,
+               flavorFor: P.some(x => x.id === id && x.flavors) ? id : null };
+    }
     else if (h.indexOf('/choose/') === 0) {
       const id = h.slice(8);
       next = P.some(x => x.id === id && x.flavors)
@@ -1243,6 +1292,9 @@ class Component extends DCLogic {
     }
     window.addEventListener('resize', this.measure);
   }
+  // the route each dialog level was opened from, so closing one comes back
+  _base = [];
+
   componentDidUpdate() {
     this.syncDoc();
     // reading layout on every update forces a reflow; the header only
@@ -1260,20 +1312,22 @@ class Component extends DCLogic {
     const route = this.routeOf(this.state);
     if (this._route !== route) {
       const prev = this._route;
-      const wasDialog = /^\/(order|choose)/.test(prev || '');
-      const isDialog = /^\/(order|choose)/.test(route);
+      // 0 the menu, 1 a dialog over it, 2 the chooser over the order page
+      const depth = r => r.indexOf('/order/choose/') === 0 ? 2
+        : /^\/(order|choose)/.test(r) ? 1 : 0;
+      const was = depth(prev || ''), now = depth(route);
       this._route = route;
       // Typing would otherwise rewrite the URL on every keystroke, which
       // Safari rate-limits, so the search route settles after you stop.
       clearTimeout(this._rt);
       const go = () => {
-        if (isDialog && !wasDialog) { this._base = prev; history.pushState(null, '', '#' + route); }
-        else if (!isDialog && wasDialog) {
+        if (now > was) { this._base[now] = prev; history.pushState(null, '', '#' + route); }
+        else if (now < was) {
           // Going back restores the view the dialog was opened from, which is
           // right when it was simply dismissed. But a dialog can also send you
-          // somewhere new - "browse the food" - and going back would undo that
-          // move the moment it happened. Replace the entry in that case.
-          if (route === this._base) history.back();
+          // somewhere new - a different section - and going back would undo
+          // that move the moment it happened. Replace the entry in that case.
+          if (route === this._base[was]) history.back();
           else history.replaceState(null, '', '#' + route);
         }
         else history.replaceState(null, '', '#' + route);
@@ -1393,25 +1447,18 @@ class Component extends DCLogic {
       };
     }).filter(Boolean);
 
-    // What the basket is missing, and what is already in it that points there.
-    // Each item is asked for its own track first, so a cold drink comes back
-    // with something to eat and a coffee with something sweet. A basket that
-    // already holds both something to eat and something to drink is left alone.
-    const inOrder = Object.keys(s.order).map(k => k.split(':')[1]);
-    const held = inOrder.map(id => P.find(x => x.id === id)).filter(Boolean);
-    const hasFood = held.some(EATS);
-    const hasDrink = held.some(x => !EATS(x));
-    let sug = null;
-    if (held.length && !(hasFood && hasDrink)) {
-      for (const it of held) {
-        sug = wantsOf(it)
-          .map(side => (it.with || {})[side])
-          .map(id => id && P.find(x => x.id === id))
-          .find(c => c && oneTap(c) && inOrder.indexOf(c.id) < 0
-                  && EATS(c) !== hasFood) || null;
-        if (sug) break;
-      }
-    }
+    // The whole section that answers what the basket opened with: order a
+    // coffee and the sweets come back, order something cold and the food
+    // does. The first item decides, so the shelf never changes section under
+    // you as you add to it, and it leads with the one that goes with what is
+    // already there. It is a taste suggestion, not a claim about what other
+    // people ordered.
+    const first = P.find(x => x.id === (Object.keys(s.order)[0] || '').split(':')[1]);
+    const sugSide = first && wantsOf(first).find(sd => P.some(x => x.cat === CAT_OF[sd]));
+    const lead = sugSide && (first.with || {})[sugSide];
+    const sugItems = sugSide ? P.filter(x => x.cat === CAT_OF[sugSide])
+      .sort((a, b) => (b.id === lead) - (a.id === lead)) : [];
+    const sugCat = sugSide && CATS.find(c => c.key === CAT_OF[sugSide]);
 
     const fp = P.find(p => p.id === s.flavorFor);
 
@@ -1471,18 +1518,11 @@ class Component extends DCLogic {
       })) : [],
       closeFlavor: () => this.setState({ flavorFor: null }),
 
-      // One suggestion, drawn from what is already in the basket and following
-      // that item's own track: a refresher brings back something to eat, a
-      // coffee brings back something sweet where the menu has one. It is a
-      // taste suggestion, not a claim about what other people ordered.
-      hasSuggestion: !!sug,
+      hasSuggestion: sugItems.length > 0,
       suggestTitle: t.suggestTitle,
-      suggestName: sug ? this.nameOf(sug, l) : '',
-      suggestSub: sug ? this.subOf(sug, l) : '',
-      suggestPrice: sug ? F(sug.price) : '',
-      suggestLabel: t.suggestAdd,
-      suggestAria: sug ? t.suggestAdd + ' ' + this.nameOf(sug, l) : '',
-      suggestAdd: () => { if (sug) this.bump('p:' + sug.id + '::', 1); },
+      suggestSection: sugCat ? sugCat[l] : '',
+      suggestSectionSub: sugCat ? sugCat[l === 'ar' ? 'en' : 'ar'] : '',
+      suggestItems: sugItems.map(x => this.card(x, l, t)),
 
       hasOrder: orderCount > 0,
       orderCountLabel: this.countLabel(orderCount, t),
