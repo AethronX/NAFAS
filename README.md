@@ -93,13 +93,13 @@ The order page's suggestion runs on two tracks that never cross. Every item name
 `with` names the item that leads the shelf; the shelf shows that item's whole section.
 
 - الأطراف: `refresh` المشروبات الباردة، `warm` المشروبات الساخنة، `coffee` مشروبات القهوة، `savoury` المأكولات، `sweet` الحلا. كل صنف يأخذ طرفه من `cat`، و`CAT_OF` يحوّل الطرف إلى قسم كامل من المنيو.
-- **الرفّ يعرض القسم كاملاً**، لا صنفاً واحداً. أول صنف في السلة هو الذي يحدّد القسم، فلا يتبدّل الرفّ تحت إصبعك وأنت تضيف منه.
+- **الرفّ يعرض القسم كاملاً**، لا صنفاً واحداً. القسم يُحسم بالصنف الذي يفتح الطلب ثم **يثبت**: `sideFor()` تحفظه في `sugSide` ويرافق السلة إلى التخزين، فلا يتبدّل وأنت تضيف منه ولا حين تسحب سطراً ولا بعد تحديث الصفحة. تفريغ السلة وحده ينساه، فيختار الطلب التالي من جديد.
 - `with` لم يعد يختار الاقتراح وإنما يحدّد **الصنف الذي يتصدّر الرفّ**: اسبريسو يضع التيراميسو أولاً، والقهوة العربية تضع البقلاوة أولاً.
 - `WANTS` يحدّد ترتيب ما يطلبه كل طرف. القهوة والساخن يطلبان `sweet` ثم `savoury`، فلو حُذف الحلا يوماً عاد المسار البديل وحده.
 - `wants` تقلب الترتيب لصنف واحد: شطيرتا البيض تطلبان القهوة قبل البارد.
 - صفوف الرفّ هي صفوف المنيو نفسها: عدّاد كمية، وزرّا ساخن/بارد لما يُقدَّم بالوجهين، ونافذة النكهة للآيس تي والموهيتو — تفتح فوق صفحة الطلب على المسار `#/order/choose/<id>` ويعيدها زر الرجوع إلى الطلب لا إلى المنيو.
 
-- The shelf offers the **whole section**, not one item. The basket's first item picks it, so it never changes section under your finger as you add from it.
+- The shelf offers the **whole section**, not one item. The item that opens the order picks it and it is then **held** in `sugSide`, saved alongside the basket — it does not change as you add from it, when a line is taken back out, or across a reload. Only emptying the basket forgets it.
 - `with` no longer picks the suggestion; it picks **which item leads the shelf** — espresso puts the tiramisu first, Arabic coffee puts the baklava first.
 - `WANTS` sets what each side asks for, in order. Coffee and hot drinks ask for `sweet` then `savoury`, so removing the sweets restores the fallback on its own.
 - `wants` flips the order for a single item: the two egg sandwiches ask for coffee before a cold drink.

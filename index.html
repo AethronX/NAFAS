@@ -1214,7 +1214,7 @@ const T = {
 
 class Component extends DCLogic {
   state = { lang: 'ar', cat: 'all', query: '', flavorFor: null,
-            order: {}, orderOpen: false, clearArm: false, headerH: 150 };
+            order: {}, sugSide: null, orderOpen: false, clearArm: false, headerH: 150 };
   headerRef = React.createRef();
 
   measure = () => {
@@ -1283,8 +1283,8 @@ class Component extends DCLogic {
   // never sent anywhere. Stale for four hours so yesterday's order cannot
   // come back to confuse anyone.
   KEEP = 4 * 60 * 60 * 1000;
-  saveOrder(order) {
-    try { localStorage.setItem('nafas.order', JSON.stringify({ t: Date.now(), order })); }
+  saveOrder(order, side) {
+    try { localStorage.setItem('nafas.order', JSON.stringify({ t: Date.now(), order, side })); }
     catch (e) {}
   }
   loadOrder() {
@@ -1299,7 +1299,8 @@ class Component extends DCLogic {
         const n = Math.floor(Number(raw.order[k]));
         if (Number.isFinite(n) && n > 0) clean[k] = Math.min(n, MAX_QTY);
       }
-      return Object.keys(clean).length ? clean : null;
+      if (!Object.keys(clean).length) return null;
+      return { order: clean, side: CAT_OF[raw.side] ? raw.side : null };
     } catch (e) { return null; }
   }
   componentDidMount() {
@@ -1311,7 +1312,7 @@ class Component extends DCLogic {
     // without this the route sync would quietly put the old section back.
     window.addEventListener('hashchange', this.applyRoute);
     const kept = this.loadOrder();
-    if (kept) this.setState({ order: kept });
+    if (kept) this.setState({ order: kept.order, sugSide: this.sideFor(kept.order, kept.side) });
     if (location.hash) this.applyRoute(); else this._route = this.routeOf(this.state);
     window.addEventListener('keydown', this.onKey);
     this.measure();
@@ -1363,7 +1364,10 @@ class Component extends DCLogic {
       };
       if (route.indexOf('/search/') === 0) this._rt = setTimeout(go, 500); else go();
     }
-    if (this._saved !== this.state.order) { this._saved = this.state.order; this.saveOrder(this.state.order); }
+    if (this._saved !== this.state.order) {
+      this._saved = this.state.order;
+      this.saveOrder(this.state.order, this.state.sugSide);
+    }
 
     const lock = !!(this.state.orderOpen || this.state.flavorFor);
     if (lock && !this._lock) {
@@ -1412,7 +1416,20 @@ class Component extends DCLogic {
     const next = Math.min((order[key] || 0) + by, MAX_QTY);
     if (next <= 0) delete order[key]; else order[key] = next;
     const empty = !Object.keys(order).length;
-    this.setState({ order, orderOpen: empty ? false : this.state.orderOpen });
+    this.setState({ order, sugSide: this.sideFor(order, this.state.sugSide),
+                   orderOpen: empty ? false : this.state.orderOpen });
+  }
+  // The section the shelf offers is decided by the item that opens the order,
+  // and then it is held. It is one suggestion for this order, not a running
+  // commentary on the last thing added: it must not change section while the
+  // customer is adding from it, or when a line is taken back out. An empty
+  // basket forgets it, so the next order picks again.
+  sideFor(order, held) {
+    const ids = Object.keys(order);
+    if (!ids.length) return null;
+    if (held && CAT_OF[held]) return held;
+    const first = P.find(x => x.id === ids[0].split(':')[1]);
+    return (first && wantsOf(first).find(sd => P.some(x => x.cat === CAT_OF[sd]))) || null;
   }
   orderCount() { return Object.values(this.state.order).reduce((a, n) => a + n, 0); }
   orderTotal() {
@@ -1482,14 +1499,13 @@ class Component extends DCLogic {
     }).filter(Boolean);
 
     // The whole section that answers what the basket opened with: order a
-    // coffee and the sweets come back, order something cold and the food
-    // does. The first item decides, so the shelf never changes section under
-    // you as you add to it, and it leads with the one that goes with what is
-    // already there. It is a taste suggestion, not a claim about what other
-    // people ordered.
+    // coffee and the sweets come back, order something cold and the food does.
+    // The section is settled by sideFor() when the order starts and held from
+    // then on; only which item leads it follows what is in the basket. It is a
+    // taste suggestion, not a claim about what other people ordered.
+    const sugSide = this.sideFor(s.order, s.sugSide);
     const first = P.find(x => x.id === (Object.keys(s.order)[0] || '').split(':')[1]);
-    const sugSide = first && wantsOf(first).find(sd => P.some(x => x.cat === CAT_OF[sd]));
-    const lead = sugSide && (first.with || {})[sugSide];
+    const lead = sugSide && first && (first.with || {})[sugSide];
     const sugItems = sugSide ? P.filter(x => x.cat === CAT_OF[sugSide])
       .sort((a, b) => (b.id === lead) - (a.id === lead)) : [];
     const sugCat = sugSide && CATS.find(c => c.key === CAT_OF[sugSide]);
@@ -1546,10 +1562,7 @@ class Component extends DCLogic {
       flavorPrice: fp ? F(fp.price) : '',
       flavorList: fp ? FLAVORS.map((f, i) => ({
         label: f[l],
-        pick: () => this.setState({ flavorFor: null, order: (() => {
-          const o = { ...this.state.order }; const k = 'p:' + fp.id + '::' + i;
-          o[k] = (o[k] || 0) + 1; return o;
-        })() })
+        pick: () => { this.bump('p:' + fp.id + '::' + i, 1); this.setState({ flavorFor: null }); }
       })) : [],
       closeFlavor: () => this.setState({ flavorFor: null }),
 
@@ -1580,7 +1593,7 @@ class Component extends DCLogic {
           return;
         }
         clearTimeout(this._ct);
-        this.setState({ order: {}, orderOpen: false, clearArm: false });
+        this.setState({ order: {}, sugSide: null, orderOpen: false, clearArm: false });
       },
       orderLines,
 
