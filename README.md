@@ -18,6 +18,7 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 
 ## المميزات / Features
 
+- واجهة استقبال أولى: الشعار، وحالة المقهى مفتوح/مغلق، واختيار طريقة الطلب (في المقهى / سفري)، وأزرار الاتصال والموقع وإنستغرام. الطريقة المختارة تظهر في ترويسة صفحة الطلب ويمكن تغييرها من هناك. رابط يشير إلى قسم بعينه يتجاوز الواجهة، ومن كان في وسط طلبه يعود إلى طلبه لا إلى الباب — a welcome screen on arrival: the wordmark, the open/closed badge, the way the order is wanted (here / to go), and call, map and Instagram. The chosen way shows in the order page header and can be changed there. A link that names a section walks past the welcome, and a customer mid-order comes back to the order, not to the door
 - ٣٣ صنفاً منسوخة من منيو المقهى المطبوع: مشروبات القهوة (١٣)، المشروبات الساخنة (٥)، المشروبات الباردة (٤)، المأكولات (٧)، الحلا (٤) — 33 items transcribed from the café's printed menu
 - تبديل اللغة بين العربية والإنجليزية مع دعم RTL كامل — Arabic/English toggle with full RTL support
 - رفّ اقتراح في صفحة الطلب يعرض القسم المكمّل كاملاً على مسارين منفصلين: المشروبات الباردة ↔ المأكولات، والقهوة ↔ الحلا — a shelf on the order page offering the whole complementary section, on two separate tracks: cold drinks ↔ food, and coffee ↔ sweets

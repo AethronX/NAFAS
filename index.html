@@ -393,7 +393,7 @@ a:hover{color:#5E0A1F}
           <svg class="i" width="16" height="16" sc-camel-view-box="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"></path><path d="M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg>
         </a>
         <a href="https://instagram.com/nefas_o" target="_blank" rel="noopener" aria-label="@nefas_o" style="width:38px;height:38px;display:grid;place-items:center;border-radius:999px;background:#fff;border:1px solid #E9DDE1;color:#24191B" style-hover="border-color:#8A0F2D;color:#8A0F2D">
-          <svg class="i" width="16" height="16" sc-camel-view-box="0 0 24 24"><path d="M3 3h18v18H3Z"></path><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8"></path><path d="M17.5 6.5h.01"></path></svg>
+          <svg class="i" width="16" height="16" sc-camel-view-box="0 0 24 24"><path d="M7.5 2.5h9a5 5 0 0 1 5 5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z"></path><path d="M12 15.8a3.8 3.8 0 1 0 0-7.6 3.8 3.8 0 0 0 0 7.6"></path><path d="M17.3 6.7h.01"></path></svg>
         </a>
       </span>
     </div>
@@ -545,6 +545,63 @@ a:hover{color:#5E0A1F}
     </div>
   </sc-if>
 
+  <sc-if value="{{ showWelcome }}">
+    <div dir="{{ dir }}" style="position:fixed;inset:0;z-index:70;background:#E9DFD9;overflow-y:auto;animation:fade 200ms ease-out">
+      <div style="position:relative;max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:26px;padding:calc(64px + env(safe-area-inset-top)) 18px calc(26px + env(safe-area-inset-bottom))">
+
+        <div style="position:absolute;top:calc(14px + env(safe-area-inset-top));inset-inline-end:18px">
+          <button sc-camel-on-click="{{ toggleLang }}" style="min-height:40px;padding:0 15px;border-radius:999px;background:#fff;border:1px solid #E9DDE1;cursor:pointer;font-family:Archivo,sans-serif;font-size:11px;font-weight:600;color:#8A0F2D;letter-spacing:0.08em" style-hover="border-color:#8A0F2D">{{ langLabel }}</button>
+        </div>
+
+        <div style="flex:none;text-align:center">
+          <span style="display:inline-grid;place-items:center;width:112px;height:112px;border-radius:999px;background:#8A0F2D;box-shadow:var(--e2)">
+            <img src="assets/logo-white.webp" alt="" width="74" height="48" style="display:block;width:74px;height:48px;object-fit:contain">
+          </span>
+          <div style="margin-top:16px;font-size:27px;font-weight:700;letter-spacing:-.01em;line-height:1.35">{{ brandName }}</div>
+          <div dir="{{ subDir }}" style="margin-top:4px;font-family:Archivo,sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#6A5C5F">{{ brandLatin }}</div>
+          <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:999px;background:{{ openBg }};color:{{ openColor }};font-size:13px;font-weight:700">
+              <span aria-hidden="true" style="flex:none;width:7px;height:7px;border-radius:999px;background:{{ openDot }}"></span>
+              <span>{{ openLabel }}</span>
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#6A5C5F">
+              <svg class="i" width="14" height="14" sc-camel-view-box="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"></path><path d="M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg>
+              <span>{{ branchLine }}</span>
+            </span>
+          </div>
+        </div>
+
+        <div style="flex:none">
+          <div style="text-align:center;font-size:14px;font-weight:600;color:#6A5C5F;margin-bottom:11px">{{ pickModeLabel }}</div>
+          <sc-for list="{{ modeCards }}" as="m" hint-placeholder-count="2">
+            <button sc-camel-on-click="{{ m.pick }}" class="ncard" style="width:100%;margin-bottom:10px;padding:15px 16px;border:1px solid #E9DDE1;cursor:pointer;display:flex;align-items:center;gap:13px;text-align:start;font-family:inherit;color:inherit" style-hover="border-color:#8A0F2D;background:#FDF7F9">
+              <span style="flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#FDF7F9;color:#8A0F2D">
+                <svg class="i" width="21" height="21" sc-camel-view-box="0 0 24 24"><path sc-camel-d="{{ m.icon }}"></path></svg>
+              </span>
+              <span style="flex:1;min-width:0;display:block">
+                <span style="display:block;font-size:17px;font-weight:700">{{ m.name }}</span>
+                <span style="display:block;margin-top:2px;font-size:12.5px;color:#6A5C5F">{{ m.sub }}</span>
+              </span>
+              <svg class="i chev" width="18" height="18" sc-camel-view-box="0 0 24 24" style="color:#B85C73"><path d="m9 18 6-6-6-6"></path></svg>
+            </button>
+          </sc-for>
+
+          <div style="display:flex;justify-content:center;gap:12px;margin-top:20px">
+            <a href="tel:+96890000000" aria-label="{{ callLabel }}" style="width:46px;height:46px;display:grid;place-items:center;border-radius:999px;background:#fff;border:1px solid #E9DDE1;color:#8A0F2D" style-hover="background:#8A0F2D;border-color:#8A0F2D;color:#fff">
+              <svg class="i" width="19" height="19" sc-camel-view-box="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"></path></svg>
+            </a>
+            <a href="https://maps.app.goo.gl/MN1farBFr92RMBxt9" target="_blank" rel="noopener" aria-label="{{ mapLabel }}" style="width:46px;height:46px;display:grid;place-items:center;border-radius:999px;background:#fff;border:1px solid #E9DDE1;color:#8A0F2D" style-hover="background:#8A0F2D;border-color:#8A0F2D;color:#fff">
+              <svg class="i" width="19" height="19" sc-camel-view-box="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"></path><path d="M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg>
+            </a>
+            <a href="https://instagram.com/nefas_o" target="_blank" rel="noopener" aria-label="@nefas_o" style="width:46px;height:46px;display:grid;place-items:center;border-radius:999px;background:#fff;border:1px solid #E9DDE1;color:#8A0F2D" style-hover="background:#8A0F2D;border-color:#8A0F2D;color:#fff">
+              <svg class="i" width="19" height="19" sc-camel-view-box="0 0 24 24"><path d="M7.5 2.5h9a5 5 0 0 1 5 5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z"></path><path d="M12 15.8a3.8 3.8 0 1 0 0-7.6 3.8 3.8 0 0 0 0 7.6"></path><path d="M17.3 6.7h.01"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ flavorOpen }}">
     <div dir="{{ dir }}" role="dialog" aria-modal="true" aria-label="{{ a11yFlavorDialog }}" style="position:fixed;inset:0;z-index:60;background:rgba(46,4,16,0.52);display:flex;flex-direction:column;justify-content:flex-end;animation:fade 160ms ease-out">
       <div sc-camel-on-click="{{ closeFlavor }}" style="flex:1;cursor:pointer"></div>
@@ -581,7 +638,15 @@ a:hover{color:#5E0A1F}
         <span style="flex:none;width:1px;height:30px;background:rgba(255,255,255,.26)"></span>
         <span style="flex:1;min-width:0;display:block">
           <h2 style="display:block;font-size:19px;font-weight:700;line-height:1.3">{{ myOrderLabel }}</h2>
-          <span style="display:block;font-size:12px;color:rgba(255,255,255,.74)">{{ orderCountLabel }}</span>
+          <span style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span style="font-size:12px;color:rgba(255,255,255,.74)">{{ orderCountLabel }}</span>
+            <sc-if value="{{ hasMode }}">
+              <button sc-camel-on-click="{{ changeMode }}" aria-label="{{ changeModeLabel }}" style="display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.30);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:#fff" style-hover="background:#fff;color:#8A0F2D">
+                <span>{{ modeName }}</span>
+                <svg class="i" width="12" height="12" sc-camel-view-box="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+              </button>
+            </sc-if>
+          </span>
         </span>
         <button sc-camel-on-click="{{ toggleLang }}" style="flex:none;min-height:40px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.34);cursor:pointer;font-family:Archivo,sans-serif;font-size:11px;font-weight:600;color:#fff;letter-spacing:0.08em;transition:background 160ms,border-color 160ms" style-hover="background:#fff;border-color:#fff;color:#8A0F2D">{{ langLabel }}</button>
         <button sc-camel-on-click="{{ closeOrder }}" aria-label="{{ a11yClose }}" style="flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.30);cursor:pointer;color:#fff" style-hover="background:#fff;color:#8A0F2D">
@@ -740,6 +805,8 @@ const I = {
   moon: 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z',
   cup: 'M3 9h14v7a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5Z M17 11h1a3 3 0 0 1 0 6h-1 M7 2c0 1.6 1 1.6 1 3 M11 2c0 1.6 1 1.6 1 3',
   burger: 'M4 10a8 8 0 0 1 16 0Z M3 14h18 M4 17h16a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z',
+  plate: 'M5 6h11v6a5.5 5.5 0 0 1-11 0Z M16 8h1.5a2.5 2.5 0 0 1 0 5H16 M3 20h18',
+  togo: 'M4.5 5h15l-1 3h-13Z M6 9h12l-1.1 11a2 2 0 0 1-2 1.8H9.1a2 2 0 0 1-2-1.8Z M7 14h10',
   check: 'm20 6-11 11-5-5',
   plus: 'M12 5v14 M5 12h14'
 };
@@ -817,6 +884,14 @@ const partOf = h => h < 11 ? 'morning' : h < 16 ? 'afternoon' : 'evening';
 // Change these together with the branch line below them.
 const HOURS = { open: 9, close: 23 };
 const openNow = () => { const h = new Date().getHours(); return h >= HOURS.open && h < HOURS.close; };
+
+// How the order will be served. It rides with the order so the counter knows
+// whether to reach for a glass or a lid. These are the two ways this branch
+// serves; a branch that adds another way adds it here.
+const MODES = [
+  { key: 'in', icon: I.plate },
+  { key: 'away', icon: I.togo }
+];
 const leadsNow = () => {
   const h = new Date().getHours();
   return NOW_LEADS[partOf(isFinite(h) ? h : 12)] || [];
@@ -953,6 +1028,10 @@ const T = {
     orderNote: 'راجع الكميات والإجمالي قبل أن تطلب.',
     suggestTitle: 'جرّبه مع', lastTitle: 'طلبك السابق', repeatOrder: 'أعِد الطلب',
     openNow: 'مفتوح الآن', closedNow: 'مغلق الآن', untilHour: 'حتى ١١ م', opensHour: 'يفتح ٩ ص',
+    welcome: 'أهلاً بك', pickMode: 'كيف تحب طلبك؟',
+    modeIn: 'في المقهى', modeInSub: 'اجلس ونحضّره لك',
+    modeAway: 'سفري', modeAwaySub: 'جاهز لتأخذه معك',
+    changeMode: 'تغيير',
     a11ySearch: 'ابحث في المنيو', a11yClearSearch: 'مسح البحث', a11yClose: 'إغلاق',
     a11yInc: 'زيادة الكمية', a11yDec: 'إنقاص الكمية',
     a11yFlavorDialog: 'اختيار النكهة', a11yOrderDialog: 'طلبي',
@@ -976,6 +1055,10 @@ const T = {
     orderNote: 'Check the quantities and total before you order.',
     suggestTitle: 'Try it with', lastTitle: 'Your last order', repeatOrder: 'Order it again',
     openNow: 'Open now', closedNow: 'Closed now', untilHour: 'until 11 PM', opensHour: 'opens 9 AM',
+    welcome: 'Welcome', pickMode: 'How would you like it?',
+    modeIn: 'Here', modeInSub: 'Take a seat, we will bring it',
+    modeAway: 'To go', modeAwaySub: 'Ready to take with you',
+    changeMode: 'Change',
     a11ySearch: 'Search the menu', a11yClearSearch: 'Clear search', a11yClose: 'Close',
     a11yInc: 'Increase quantity', a11yDec: 'Decrease quantity',
     a11yFlavorDialog: 'Choose a flavour', a11yOrderDialog: 'My order',
@@ -990,8 +1073,11 @@ const T = {
 };
 
 class Component extends DCLogic {
-  state = { lang: 'ar', cat: 'all', query: '', flavorFor: null, last: null,
-            order: {}, sugSide: null, orderOpen: false, clearArm: false, headerH: 150 };
+  // `mode` is null until the customer says how they are being served, and the
+  // welcome stands in front of the menu until then. A link that names a
+  // section skips it, so a shared link still lands where it points.
+  state = { lang: 'ar', cat: 'all', query: '', flavorFor: null, last: null, mode: null,
+            greeted: false, order: {}, sugSide: null, orderOpen: false, clearArm: false, headerH: 150 };
   headerRef = React.createRef();
 
   measure = () => {
@@ -1060,8 +1146,8 @@ class Component extends DCLogic {
   // never sent anywhere. Stale for four hours so yesterday's order cannot
   // come back to confuse anyone.
   KEEP = 4 * 60 * 60 * 1000;
-  saveOrder(order, side) {
-    try { localStorage.setItem('nafas.order', JSON.stringify({ t: Date.now(), order, side })); }
+  saveOrder(order, side, mode) {
+    try { localStorage.setItem('nafas.order', JSON.stringify({ t: Date.now(), order, side, mode })); }
     catch (e) {}
   }
   // keep only what the menu could have written, at a quantity it could have
@@ -1098,7 +1184,8 @@ class Component extends DCLogic {
       if (!raw || Date.now() - raw.t > this.KEEP) return null;
       const clean = this.cleanOrder(raw.order);
       if (!clean) return null;
-      return { order: clean, side: CAT_OF[raw.side] ? raw.side : null };
+      return { order: clean, side: CAT_OF[raw.side] ? raw.side : null,
+               mode: MODES.some(m => m.key === raw.mode) ? raw.mode : null };
     } catch (e) { return null; }
   }
   componentDidMount() {
@@ -1110,7 +1197,15 @@ class Component extends DCLogic {
     // without this the route sync would quietly put the old section back.
     window.addEventListener('hashchange', this.applyRoute);
     const kept = this.loadOrder();
-    if (kept) this.setState({ order: kept.order, sugSide: this.sideFor(kept.order, kept.side) });
+    // A basket still on this phone means the customer is mid-order, not newly
+    // arrived: a reload, a screen that locked, a tab they came back to. Send
+    // them to their order, not through the door a second time. The basket goes
+    // stale in four hours, so tomorrow's scan still meets the welcome.
+    if (kept) this.setState({ order: kept.order, sugSide: this.sideFor(kept.order, kept.side),
+                              mode: kept.mode, greeted: !!kept.mode });
+    // a shared link that points at a section is a request for that section
+    const h = (location.hash || '').replace(/^#/, '');
+    if (h && h !== '/') this.setState({ greeted: true });
     this.setState({ last: this.loadLast() });
     if (location.hash) this.applyRoute(); else this._route = this.routeOf(this.state);
     window.addEventListener('keydown', this.onKey);
@@ -1165,11 +1260,11 @@ class Component extends DCLogic {
     }
     if (this._saved !== this.state.order) {
       this._saved = this.state.order;
-      this.saveOrder(this.state.order, this.state.sugSide);
+      this.saveOrder(this.state.order, this.state.sugSide, this.state.mode);
       this.saveLast(this.state.order);
     }
 
-    const lock = !!(this.state.orderOpen || this.state.flavorFor);
+    const lock = !!(this.state.orderOpen || this.state.flavorFor || this.showWelcome());
     if (lock && !this._lock) {
       this._lock = true;
       this._y = window.scrollY;
@@ -1224,6 +1319,8 @@ class Component extends DCLogic {
   // commentary on the last thing added: it must not change section while the
   // customer is adding from it, or when a line is taken back out. An empty
   // basket forgets it, so the next order picks again.
+  // The welcome shows until the customer has been past it once.
+  showWelcome() { return !this.state.greeted && !this.state.orderOpen && !this.state.flavorFor; }
   sideFor(order, held) {
     const ids = Object.keys(order);
     if (!ids.length) return null;
@@ -1436,6 +1533,23 @@ class Component extends DCLogic {
       infoKicker: t.infoKicker,
       info: t.info.map(r => ({ ...r, isLink: !!r.href, plain: !r.href })),
       callLabel: t.call, mapLabel: t.map,
+
+      // The welcome: who the café is, whether it is open, and how the order
+      // will be served. It stands in front of the menu once, on arrival.
+      showWelcome: this.showWelcome(),
+      welcomeLabel: t.welcome,
+      pickModeLabel: t.pickMode,
+      modeCards: MODES.map(m => ({
+        name: m.key === 'in' ? t.modeIn : t.modeAway,
+        sub: m.key === 'in' ? t.modeInSub : t.modeAwaySub,
+        icon: m.icon,
+        pick: () => this.setState({ mode: m.key, greeted: true })
+      })),
+      hasMode: !!s.mode,
+      modeName: s.mode === 'in' ? t.modeIn : s.mode === 'away' ? t.modeAway : '',
+      changeModeLabel: t.changeMode,
+      changeMode: () => this.setState({ greeted: false, orderOpen: false }),
+
 
       // Whether the door is open, read from the branch's own hours and the
       // customer's clock. It says nothing the branch card does not already say.
