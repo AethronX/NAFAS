@@ -29,6 +29,8 @@ A bilingual (Arabic / English) interactive menu for **Nafas Qahwa** — Bahla So
 - صفحة طلب واحدة: الكميات والإجمالي — a single order page with quantities and a running total
 - لا يُرسل الطلب إلى أي جهة؛ يُحفظ على جهاز الزبون وحده لأربع ساعات ليصمد أمام تحديث الصفحة — the order is never transmitted; it is kept on the customer's own device for four hours so a reload cannot lose it
 - تبديل اللغة متاح داخل صفحة الطلب أيضاً، لا في المنيو وحده — the language switch is on the order page too, not only on the menu
+- «مفتوح الآن / مغلق الآن» تُقرأ من ساعات الفرع وساعة جهاز الزبون، مع زرّي الاتصال والموقع وإنستغرام في أعلى المنيو لا في ذيله — an open/closed badge read from the branch hours and the customer's own clock, with call, map and Instagram at the top of the menu rather than buried in its footer
+- كل مجموعة بطاقة بيضاء ترتفع عن أرضية رملية دافئة، فتُقرأ الأقسام دون خطوط ثقيلة بين الصفوف — each group is a white card lifted off a warm sand ground, so sections read apart without heavy rules between rows
 - زر الرجوع يغلق النافذة ولا يغادر الصفحة — the back button closes a dialog instead of leaving the page
 - الأسعار بالريال العُماني — prices in Omani Rial
 
